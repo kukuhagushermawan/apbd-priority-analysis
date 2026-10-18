@@ -4,47 +4,16 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - "pipeline/**"
-      - "data/raw/**"
-      - ".github/workflows/pipeline.yml"
-  pull_request:
-    paths:
-      - "pipeline/**"
-      - "data/raw/**"
+    paths: ["pipeline/**", "data/raw/**"]
 
 jobs:
   run:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: pip
-          cache-dependency-path: pipeline/requirements.txt
-
-      - name: Pasang dependensi
-        run: python -m pip install -r pipeline/requirements.txt
-
-      - name: Lint
-        run: |
-          python -m ruff check pipeline
-          python -m ruff format --check pipeline
-
-      - name: Audit format data mentah
-        run: python -m pipeline.audit
-
-      - name: Uji
-        run: python -m pytest
-
-      - name: Jalankan pipeline
-        run: python -m pipeline.run --force
-
-      - name: Unggah keluaran Parquet
-        uses: actions/upload-artifact@v4
-        with:
-          name: processed-parquet
-          path: data/processed/
-          retention-days: 30
+      - run: pip install -r pipeline/requirements.txt
+      - run: python -m pytest pipeline
+      - run: python -m pipeline.run

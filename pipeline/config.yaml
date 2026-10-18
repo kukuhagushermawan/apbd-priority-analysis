@@ -1,0 +1,86 @@
+# Konfigurasi pipeline. Penjelasan setiap isian ada di docs/metodologi.md.
+
+# Lokasi data per tahun. Sheet Fungsi punya tata letak sama di semua tahun:
+# baris 3 "Jumlah: N daerah", baris 5 nama fungsi, baris 6 jenis belanja,
+# data mulai baris 7 (kolom A kode pemda, B nama pemda).
+# Sheet Ringkas: baris 4 kode pemda, baris berlabel "5. Belanja Daerah" = total.
+tahun:
+  2022:
+    fungsi: {berkas: 2022/Anggaran-Belanja-Fungsi_2022.xlsx, sheet: Sheet3}
+    ringkas: {berkas: 2022/Anggaran_APBD_Ringkas_2022.xlsx, sheet: APBD 2022_FINAL}
+  2023:
+    fungsi: {berkas: 2023/Anggaran_Belanja_Fungsi_2023.xlsx, sheet: Fungsi_Kepmen050}
+    ringkas: {berkas: 2023/Anggaran_APBD_Ringkas_2023.xlsx, sheet: Sheet2}
+  2024:
+    fungsi: {berkas: 2024/Anggaran_Belanja_Fungsi_2024.xlsx, sheet: Fungsi Kepmen}
+    ringkas: {berkas: 2024/Anggaran_APBD_Ringkas_2024.xlsx, sheet: Sheet2}
+  2025:
+    fungsi: {berkas: 2025/Anggaran_Belanja_Fungsi_2025.xlsx, sheet: Fungsi Kepmen}
+    ringkas: {berkas: 2025/Anggaran_APBD_Ringkas_2025.xlsx, sheet: Tabel}
+  2026:
+    fungsi: {berkas: 2026/Anggaran_Belanja_Fungsi_2026.xlsx, sheet: Fungsi Kepmen}
+    ringkas: {berkas: 2026/Anggaran_APBD_Ringkas_2026.xlsx, sheet: Tabel}
+
+# Kamus 11 fungsi baku. Pertahanan (02) dan Agama (09) tidak pernah muncul
+# di data 2022-2026 -> analisis memakai 9 fungsi aktif.
+# alias = variasi nama yang dipakai DJPK (2022 memakai "Lingkungan Hidup").
+fungsi:
+  "01": {nama: Pelayanan Umum, alias: [pelayanan umum]}
+  "02": {nama: Pertahanan, alias: [pertahanan]}
+  "03": {nama: Ketertiban dan Keamanan, alias: [ketertiban dan keamanan]}
+  "04": {nama: Ekonomi, alias: [ekonomi]}
+  "05": {nama: Perlindungan Lingkungan Hidup, alias: [perlindungan lingkungan hidup, lingkungan hidup]}
+  "06": {nama: Perumahan dan Fasilitas Umum, alias: [perumahan dan fasilitas umum]}
+  "07": {nama: Kesehatan, alias: [kesehatan]}
+  "08": {nama: Pariwisata, alias: [pariwisata]}
+  "09": {nama: Agama, alias: [agama]}
+  "10": {nama: Pendidikan, alias: [pendidikan]}
+  "11": {nama: Perlindungan Sosial, alias: [perlindungan sosial]}
+
+# Pemekaran Papua (berlaku APBD 2023): kode 2022 -> kode baru.
+papua_kode_lama_ke_baru:
+  "26.03": "37.01"   # Kab. Jayawijaya
+  "26.04": "35.01"   # Kab. Merauke
+  "26.05": "36.01"   # Kab. Mimika
+  "26.06": "36.02"   # Kab. Nabire
+  "26.07": "36.03"   # Kab. Paniai
+  "26.08": "36.04"   # Kab. Puncak Jaya
+  "26.13": "37.02"   # Kab. Yahukimo
+  "26.14": "37.03"   # Kab. Pegunungan Bintang
+  "26.15": "37.04"   # Kab. Tolikara
+  "26.16": "35.02"   # Kab. Boven Digoel
+  "26.17": "35.03"   # Kab. Mappi
+  "26.18": "35.04"   # Kab. Asmat
+  "26.22": "37.05"   # Kab. Mamberamo Tengah
+  "26.23": "37.06"   # Kab. Yalimo
+  "26.24": "37.07"   # Kab. Lanny Jaya
+  "26.25": "37.08"   # Kab. Nduga
+  "26.26": "36.05"   # Kab. Dogiyai
+  "26.27": "36.06"   # Kab. Puncak
+  "26.28": "36.07"   # Kab. Intan Jaya
+  "26.29": "36.08"   # Kab. Deiyai
+  "32.03": "38.01"   # Kab. Sorong
+  "32.04": "38.02"   # Kota Sorong
+  "32.05": "38.03"   # Kab. Raja Ampat
+  "32.06": "38.04"   # Kab. Sorong Selatan
+  "32.10": "38.05"   # Kab. Maybrat
+  "32.11": "38.06"   # Kab. Tambrauw
+
+# Provinsi yang datanya tidak sebanding antartahun (wilayah berubah / baru).
+panel_tidak_seimbang: ["26.00", "32.00", "35.00", "36.00", "37.00", "38.00"]
+
+# Nama kanonik untuk pemda yang namanya berbeda-beda antartahun.
+nama_kanonik:
+  "02.13": Kab. Toba
+  "03.01": Kab. Lima Puluh Kota
+  "05.01": Kab. Batang Hari
+  "18.03": Kab. Kepulauan Sangihe
+  "21.06": Kota Baubau
+
+# Validasi total fungsi vs Ringkasan: LULUS bila selisih <= 0,01% atau
+# <= Rp10.000; PERINGATAN bila <= 0,5%; selain itu GAGAL.
+validasi: {lulus_pct: 0.01, lulus_rp: 10000, peringatan_pct: 0.5}
+
+# Patahan klasifikasi 2022 -> 2023 (lihat metodologi): analisis juga
+# dijalankan untuk periode tanpa 2022.
+tahun_patahan: 2023

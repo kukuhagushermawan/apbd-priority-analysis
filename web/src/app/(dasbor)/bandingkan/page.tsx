@@ -17,7 +17,7 @@ export const metadata: Metadata = { title: "Bandingkan" };
 export default function Perbandingan({ searchParams }: PageProps<"/bandingkan">) {
   return (
     <>
-      <JudulHalaman judul="Bandingkan" keterangan="Letakkan dua sampai empat daerah berdampingan." />
+      <JudulHalaman eyebrow="Bandingkan" judul="Daerah berdampingan" keterangan="Pilih dua sampai empat daerah untuk melihat beda porsi atau nilai belanjanya." />
       <Suspense fallback={<KerangkaMemuat />}>
         <Isi searchParams={searchParams} />
       </Suspense>
@@ -40,10 +40,10 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/bandingkan">["s
 
   return (
     <>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 rounded-3xl bg-card p-5">
         <div className="flex flex-wrap items-center gap-2">
           {pemda.map((p, i) => (
-            <span key={p.kode} className="inline-flex items-center gap-2 rounded-full border py-1 pl-3 pr-1 text-sm">
+            <span key={p.kode} className="inline-flex items-center gap-2 rounded-full bg-secondary py-1.5 pr-1.5 pl-3.5 text-sm font-semibold">
               <span className="size-2.5 rounded-full" style={{ background: WARNA_SERI[i] }} aria-hidden />
               {p.nama}
               <Link href={tanpa(p.kode)} scroll={false} aria-label={`Hapus ${p.nama}`} className="rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground">

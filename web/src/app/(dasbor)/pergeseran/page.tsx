@@ -13,7 +13,11 @@ export const metadata: Metadata = { title: "Pergeseran" };
 export default function Pergeseran({ searchParams }: PageProps<"/pergeseran">) {
   return (
     <>
-      <JudulHalaman judul="Pergeseran" keterangan="Kapan prioritas belanja berubah tajam, dan daerah mana yang paling banyak berubah." />
+      <JudulHalaman
+        eyebrow="Pergeseran"
+        judul="Kapan prioritas berubah tajam"
+        keterangan="Perubahan porsi tiap tahun, daerah penyebabnya, dan daerah yang berubah jauh lebih banyak dari daerah lain."
+      />
       <Suspense fallback={<KerangkaMemuat />}>
         <Isi searchParams={searchParams} />
       </Suspense>
@@ -42,7 +46,7 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/pergeseran">["s
           Sebagian perubahan 2022→2023 terjadi karena DJPK mulai memetakan kegiatan ke fungsi dengan cara baru, bukan karena keputusan daerah.
         </Peringatan>
       )}
-      <div className="grid gap-4 xl:grid-cols-2">
+      <div className="grid gap-5 xl:grid-cols-2">
         <KartuGrafik judul="Perubahan porsi per fungsi" keterangan="Kotak bergaris tebal sedang dipilih. Klik kotak lain untuk mengganti." definisi="delta">
           <HeatmapDelta delta={ringkasan.delta} fungsiDipilih={fungsi} />
         </KartuGrafik>
@@ -64,7 +68,7 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/pergeseran">["s
       {filter.tahun === 2022 ? (
         <Kosong pesan="Pergeseran baru bisa dihitung mulai 2023. Pilih tahun lain di atas." />
       ) : (
-        <div className="grid gap-4 xl:grid-cols-2">
+        <div className="grid gap-5 xl:grid-cols-2">
           <KartuGrafik judul={`${data.namaFungsi}, ${filter.tahun}: siapa yang berubah?`} keterangan="Daerah dengan kenaikan dan penurunan porsi terbesar." definisi="delta">
             <TabelPenyumbang judul="Naik" baris={data.penyumbangNaik} query={q} />
             <TabelPenyumbang judul="Turun" baris={data.penyumbangTurun} query={q} />

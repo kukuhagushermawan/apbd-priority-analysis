@@ -88,6 +88,7 @@ export async function getRingkasan(filter: Filter) {
     jumlahPemda: jumlahPemda[t],
     totalBelanja: totalBelanja[t],
     fungsiTerbesar: urutShare[0],
+    shareTahunIni: share[t],
     kenaikanTerbesar: kenaikan,
     medianIps: ips?.median ?? null,
     jumlahLonjakan: ips?.lonjakan ?? 0,
@@ -372,4 +373,28 @@ export async function getValidasi() {
   return prisma.$queryRaw<{ pemeriksaan: string; status: string; jumlah: number; maks_rp: number | null; maks_pct: number | null }[]>`
     SELECT pemeriksaan, status, COUNT(*)::int AS jumlah, MAX(ABS(selisih_rp))::float8 AS maks_rp, MAX(ABS(selisih_pct))::float8 AS maks_pct
     FROM log_validasi GROUP BY pemeriksaan, status ORDER BY pemeriksaan, status`;
+}
+
+// ---------------------------------------------------------------------------
+// Beranda (landing page)
+// ---------------------------------------------------------------------------
+export async function getBeranda() {
+  "use cache";
+  cacheLife("weeks");
+  const ringkasan = await getRingkasan({ tahun: DAFTAR_TAHUN.at(-1)!, tingkat: null, provinsi: null, fungsi: null });
+  const [klaster] = await prisma.$queryRaw<{ awal: number; akhir: number; total: number }[]>`
+    SELECT COUNT(*) FILTER (WHERE tahun = 2023 AND nama_klaster LIKE '%Pendidikan%')::int AS awal,
+           COUNT(*) FILTER (WHERE tahun = 2026 AND nama_klaster LIKE '%Pendidikan%')::int AS akhir,
+           COUNT(*) FILTER (WHERE tahun = 2026)::int AS total
+    FROM klaster WHERE kelompok = 'kabkota'`;
+  const [klasterSemua] = await prisma.$queryRaw<{ pendidikan: number; ekonomi: number }[]>`
+    SELECT COUNT(*) FILTER (WHERE nama_klaster LIKE '%Pendidikan%')::int AS pendidikan,
+           COUNT(*) FILTER (WHERE nama_klaster LIKE '%Ekonomi%')::int AS ekonomi
+    FROM klaster WHERE tahun = 2026`;
+  const [patahan] = await prisma.$queryRaw<{ persen: number }[]>`
+    SELECT (100.0 * COUNT(*) FILTER (WHERE delta_pp < 0) / COUNT(*))::float8 AS persen
+    FROM share_fungsi WHERE tahun = 2023 AND kode_fungsi = '01' AND delta_pp IS NOT NULL`;
+  const [validasi] = await prisma.$queryRaw<{ lolos: number }[]>`
+    SELECT COUNT(*) FILTER (WHERE status = 'LULUS')::int AS lolos FROM log_validasi WHERE pemeriksaan = 'total_fungsi_vs_ringkas'`;
+  return { ringkasan, klaster, klasterSemua, persenPatahan: patahan.persen, validasiLolos: validasi.lolos };
 }

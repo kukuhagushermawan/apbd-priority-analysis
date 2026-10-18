@@ -4,10 +4,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { feature } from "topojson-client";
 import type { GeometryCollection, Topology } from "topojson-specification";
-import { daftarkanPeta, Grafik, WARNA_SERI } from "@/components/grafik";
+import { daftarkanPeta, Grafik, warnaKlaster } from "@/components/grafik";
+import { namaPendek } from "@/components/klaster-grafik";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const KOSONG = "#e6e8ec"; // wilayah tanpa data / di luar filter
+const KOSONG = "#dfe5ee"; // wilayah tanpa data / di luar filter
 
 type Klaster = { klaster: number; nama: string };
 type Anggota = { kode_pemda: string; nama_pemda: string; klaster: number };
@@ -38,13 +39,13 @@ export function PetaKlaster({ klaster, anggota, modeProvinsi, query }: { klaster
     const per = new Map(anggota.map((a) => [a.kode_pemda, a]));
     const data = kodePeta.flatMap((kode) => {
       const a = per.get(modeProvinsi ? `${kode.slice(0, 2)}.00` : kode);
-      return a ? [{ name: kode, value: a.klaster, pemda: a.nama_pemda, kode: a.kode_pemda, itemStyle: { areaColor: WARNA_SERI[a.klaster - 1] } }] : [];
+      return a ? [{ name: kode, value: a.klaster, pemda: a.nama_pemda, kode: a.kode_pemda, itemStyle: { areaColor: warnaKlaster(klaster.find((k) => k.klaster === a.klaster)?.nama ?? "", a.klaster - 1) } }] : [];
     });
     return {
       tooltip: {
         trigger: "item",
         formatter: (p: { data?: { pemda: string; value: number } }) =>
-          p.data ? `${p.data.pemda}<br/>${klaster.find((k) => k.klaster === p.data!.value)?.nama ?? ""}` : "Tidak ada data / bukan pemda ber-APBD",
+          p.data ? `${p.data.pemda}<br/>${namaPendek(klaster.find((k) => k.klaster === p.data!.value)?.nama ?? "")}` : "Tidak ada data / bukan pemda ber-APBD",
       },
       series: [
         {
@@ -58,7 +59,7 @@ export function PetaKlaster({ klaster, anggota, modeProvinsi, query }: { klaster
           top: 8,
           bottom: 8,
           itemStyle: { areaColor: KOSONG, borderColor: "#ffffff", borderWidth: 0.4 },
-          emphasis: { label: { show: false }, itemStyle: { areaColor: "#0b2d5b" } },
+          emphasis: { label: { show: false }, itemStyle: { areaColor: "#d9622b" } },
           select: { disabled: true },
           data,
         },
@@ -83,8 +84,8 @@ export function PetaKlaster({ klaster, anggota, modeProvinsi, query }: { klaster
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
         {klaster.map((k, i) => (
           <span key={k.klaster} className="inline-flex items-center gap-1.5">
-            <span className="size-3 rounded-sm" style={{ background: WARNA_SERI[i] }} aria-hidden />
-            {k.nama}
+            <span className="size-3 rounded-sm" style={{ background: warnaKlaster(k.nama, i) }} aria-hidden />
+            {namaPendek(k.nama)}
           </span>
         ))}
         <span className="inline-flex items-center gap-1.5">

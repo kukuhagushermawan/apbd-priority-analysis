@@ -13,8 +13,9 @@ export default function HalamanKlaster({ searchParams }: PageProps<"/klaster">) 
   return (
     <>
       <JudulHalaman
-        judul="Klaster & peta"
-        keterangan="Daerah dengan pola belanja mirip dikelompokkan bersama. Provinsi dan kabupaten/kota dihitung terpisah."
+        eyebrow="Klaster & peta"
+        judul="Daerah dengan pola belanja mirip"
+        keterangan="Daerah dikelompokkan menurut komposisi belanjanya. Provinsi dan kabupaten/kota dihitung terpisah."
       />
       <Suspense fallback={<KerangkaMemuat />}>
         <Isi searchParams={searchParams} />
@@ -56,7 +57,7 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/klaster">["sear
         <Peringatan>Data 2022 memakai klasifikasi fungsi yang lama, jadi sebagian perpindahan sejak 2022 bukan perubahan sungguhan.</Peringatan>
       )}
 
-      <div className="grid gap-4 xl:grid-cols-2">
+      <div className="grid gap-5 xl:grid-cols-2">
         <KartuGrafik
           judul="Ciri tiap kelompok"
           keterangan="Rata-rata porsi belanja anggota kelompok. Abu-abu: rata-rata semua daerah."
@@ -73,7 +74,7 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/klaster">["sear
         </KartuGrafik>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-3">
+      <div className="grid gap-5 xl:grid-cols-3">
         <KartuGrafik judul="Jumlah anggota" definisi="klaster">
           <Table>
             <TableHeader>

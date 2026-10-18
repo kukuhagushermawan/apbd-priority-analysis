@@ -81,7 +81,74 @@ def main() -> int:
     KELUARAN.parent.mkdir(parents=True, exist_ok=True)
     KELUARAN.write_text(json.dumps(topo, separators=(",", ":")), encoding="utf-8")
     print(f"Ditulis: {KELUARAN} ({KELUARAN.stat().st_size / 1e6:.1f} MB)")
+    buat_peta_titik(topo)
     return 0
+
+
+TITIK = FOLDER.parent / "web" / "src" / "lib" / "peta-titik.json"
+
+
+def buat_peta_titik(topo: dict, jarak: float = 0.38, skala: int = 20) -> None:
+    """Peta titik untuk ilustrasi beranda: grid titik di daratan Indonesia, tiap titik
+    diwarnai klaster 2026 kab/kota di bawahnya (butuh hasil langkah 2)."""
+    sk, tr = topo["transform"]["scale"], topo["transform"]["translate"]
+    busur = []
+    for a in topo["arcs"]:
+        x = y = 0
+        titik = []
+        for dx, dy in a:
+            x, y = x + dx, y + dy
+            titik.append((x * sk[0] + tr[0], y * sk[1] + tr[1]))
+        busur.append(titik)
+
+    def cincin(idx):
+        hasil = []
+        for i in idx:
+            seg = busur[i] if i >= 0 else busur[~i][::-1]
+            hasil.extend(seg if not hasil else seg[1:])
+        return hasil
+
+    def di_dalam(x, y, r):
+        dalam = False
+        for (x1, y1), (x2, y2) in zip(r, r[1:] + r[:1], strict=True):
+            if (y1 > y) != (y2 > y) and x < (x2 - x1) * (y - y1) / (y2 - y1) + x1:
+                dalam = not dalam
+        return dalam
+
+    klaster = pd.read_parquet(FOLDER.parent / "data" / "processed" / "klaster.parquet")
+    klaster = klaster[(klaster["tahun"] == 2026) & (klaster["kelompok"] == "kabkota")].set_index("kode_pemda")["nama_klaster"]
+    poligon = []
+    for g in topo["objects"]["kabkota"]["geometries"]:
+        kode = g["properties"]["kode_pemda"]
+        jenis = "pendidikan" if "Pendidikan" in klaster.get(kode, "") else "ekonomi" if kode else None
+        for bagian in [g["arcs"]] if g["type"] == "Polygon" else g["arcs"]:
+            cincin_ = [cincin(r) for r in bagian]
+            xs, ys = zip(*cincin_[0], strict=True)
+            poligon.append(((min(xs), min(ys), max(xs), max(ys)), cincin_, jenis))
+
+    lon0, lat0, lon1, lat1 = 95.0, 6.2, 141.4, -11.2
+    jalur = {"pendidikan": [], "ekonomi": []}
+    lat, baris = lat0, 0
+    while lat > lat1:
+        lon = lon0 + (jarak / 2 if baris % 2 else 0)  # baris berselang agar rapat
+        while lon < lon1:
+            for (x0, y0, x1, y1), cincin_, jenis in poligon:
+                if (
+                    x0 <= lon <= x1
+                    and y0 <= lat <= y1
+                    and di_dalam(lon, lat, cincin_[0])
+                    and not any(di_dalam(lon, lat, h) for h in cincin_[1:])
+                ):
+                    if jenis:
+                        jalur[jenis].append(f"M{round((lon - lon0) * skala)} {round((lat0 - lat) * skala)}h0")
+                    break
+            lon += jarak
+        lat -= jarak
+        baris += 1
+    data = {"lebar": round((lon1 - lon0) * skala), "tinggi": round((lat0 - lat1) * skala)}
+    data |= {k: "".join(v) for k, v in jalur.items()}
+    TITIK.write_text(json.dumps(data), encoding="utf-8")
+    print(f"Peta titik: {len(jalur['pendidikan'])} titik pendidikan, {len(jalur['ekonomi'])} ekonomi -> {TITIK}")
 
 
 if __name__ == "__main__":

@@ -14,7 +14,7 @@ import {
 import * as echarts from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import { useEffect, useMemo, useRef } from "react";
-import { GRID, TEKS, WARNA_SERI } from "@/lib/warna";
+import { EMAS, GRID, NAVY, TEKS } from "@/lib/warna";
 
 echarts.use([
   BarChart,
@@ -39,11 +39,11 @@ export function daftarkanPeta(nama: string, geojson: object) {
   if (!echarts.getMap(nama)) echarts.registerMap(nama, geojson as Parameters<typeof echarts.registerMap>[1]);
 }
 
-export { ABU, GRID, TEKS, WARNA_KOMPONEN, WARNA_SERI } from "@/lib/warna";
+export { ABU, EMAS, GRID, NAVY, ORANYE, TEKS, WARNA_KOMPONEN, WARNA_SERI, warnaKlaster } from "@/lib/warna";
 export const SUMBU = {
   axisTick: { show: false },
   axisLabel: { color: TEKS },
-  axisLine: { lineStyle: { color: "#e4e4e7" } },
+  axisLine: { lineStyle: { color: "#dbe2ec" } },
   splitLine: { lineStyle: { color: GRID } },
 };
 
@@ -115,7 +115,7 @@ export function GrafikPita(props: {
               data: atas.map((a, i) => (a === null || bawah[i] === null ? null : a - (bawah[i] as number))),
               lineStyle: { opacity: 0 },
               symbol: "none",
-              areaStyle: { color: "#2a78d6", opacity: 0.15 },
+              areaStyle: { color: NAVY, opacity: 0.1 },
               tooltip: { show: false },
             },
           ]
@@ -148,17 +148,17 @@ export function GrafikPita(props: {
           name: props.namaGaris,
           type: "line",
           data: garis,
-          lineStyle: { width: 2, color: WARNA_SERI[0] },
-          itemStyle: { color: WARNA_SERI[0] },
+          lineStyle: { width: 2.5, color: NAVY },
+          itemStyle: { color: NAVY },
           symbolSize: 8,
           markLine: {
             symbol: "none",
             silent: true,
             label: { color: TEKS, fontSize: 11 },
-            lineStyle: { color: "#8a94a6", type: "dashed" },
+            lineStyle: { color: "#9aa6ba", type: "dashed" },
             data: [
               ...(anotasi ?? []).map((a) => ({ xAxis: a.x, label: { formatter: a.teks, position: "insideEndTop" } })),
-              ...(acuan ? [{ yAxis: acuan.nilai, label: { formatter: acuan.label, position: "insideEndTop" }, lineStyle: { color: "#c98500" } }] : []),
+              ...(acuan ? [{ yAxis: acuan.nilai, label: { formatter: acuan.label, position: "insideEndTop" }, lineStyle: { color: "#c98500", type: "solid", width: 1.5 } }] : []),
             ],
           },
         },
@@ -168,8 +168,8 @@ export function GrafikPita(props: {
                 name: props.namaLanjutan,
                 type: "line",
                 data: garisLanjutan,
-                lineStyle: { width: 2, type: "dashed", color: WARNA_SERI[0] },
-                itemStyle: { color: "#ffffff", borderColor: WARNA_SERI[0], borderWidth: 2 },
+                lineStyle: { width: 2.5, type: "dashed", color: EMAS },
+                itemStyle: { color: "#ffffff", borderColor: EMAS, borderWidth: 2.5 },
                 symbolSize: 8,
               },
             ]

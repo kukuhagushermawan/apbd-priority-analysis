@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 type Provinsi = { kode_pemda: string; nama_pemda: string };
 
-/** Filter global (tahun, tingkat, provinsi, fungsi), disimpan di URL agar bisa dibagikan. */
+/** Filter global (tahun, tingkat, provinsi, fungsi), disimpan di URL agar tampilan bisa dibagikan. */
 export function FilterBar({ provinsi }: { provinsi: Provinsi[] }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -35,7 +35,7 @@ export function FilterBar({ provinsi }: { provinsi: Provinsi[] }) {
         ))}
       </Pilihan>
       <Pilihan label="Tingkat" value={filter.tingkat ?? ""} onChange={(v) => ubah({ tingkat: (v || null) as Filter["tingkat"] })}>
-        <option value="">Semua tingkat</option>
+        <option value="">Semua</option>
         {DAFTAR_TINGKAT.map((t) => (
           <option key={t} value={t}>
             {t[0].toUpperCase() + t.slice(1)}
@@ -43,7 +43,7 @@ export function FilterBar({ provinsi }: { provinsi: Provinsi[] }) {
         ))}
       </Pilihan>
       <Pilihan label="Provinsi" value={filter.provinsi ?? ""} onChange={(v) => ubah({ provinsi: v || null })}>
-        <option value="">Semua provinsi</option>
+        <option value="">Semua</option>
         {provinsi.map((p) => (
           <option key={p.kode_pemda} value={p.kode_pemda}>
             {p.nama_pemda.replace("Provinsi ", "")}
@@ -51,7 +51,7 @@ export function FilterBar({ provinsi }: { provinsi: Provinsi[] }) {
         ))}
       </Pilihan>
       <Pilihan label="Fungsi" value={filter.fungsi ?? ""} onChange={(v) => ubah({ fungsi: v || null })}>
-        <option value="">Semua fungsi</option>
+        <option value="">Semua</option>
         {FUNGSI_AKTIF.map((k) => (
           <option key={k} value={k}>
             {NAMA_FUNGSI[k]}
@@ -61,7 +61,7 @@ export function FilterBar({ provinsi }: { provinsi: Provinsi[] }) {
       {aktif && (
         <button
           onClick={() => ubah({ tahun: 2026, tingkat: null, provinsi: null, fungsi: null })}
-          className="col-span-2 justify-self-start px-1 text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+          className="col-span-2 justify-self-start rounded-full px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-white hover:text-foreground"
         >
           Atur ulang
         </button>
@@ -71,17 +71,22 @@ export function FilterBar({ provinsi }: { provinsi: Provinsi[] }) {
 }
 
 function Pilihan(props: { label: string; value: string; onChange: (v: string) => void; children: React.ReactNode }) {
+  const terpilih = Boolean(props.value) && props.label !== "Tahun";
   return (
-    <select
-      aria-label={props.label}
-      value={props.value}
-      onChange={(e) => props.onChange(e.target.value)}
+    <label
       className={cn(
-        "h-8 w-full min-w-0 rounded-md border bg-card px-2 text-sm outline-none transition-colors hover:border-zinc-300 focus-visible:ring-2 focus-visible:ring-ring/30 sm:w-auto sm:max-w-44",
-        props.value && props.label !== "Tahun" ? "border-zinc-400 font-medium" : "text-foreground",
+        "flex min-w-0 items-center gap-2 rounded-full bg-card py-1 pr-1 pl-4 text-xs text-muted-foreground shadow-[0_1px_2px_rgba(11,45,91,0.06)]",
+        terpilih && "ring-1 ring-primary/30",
       )}
     >
-      {props.children}
-    </select>
+      {props.label}
+      <select
+        value={props.value}
+        onChange={(e) => props.onChange(e.target.value)}
+        className="h-8 min-w-0 flex-1 cursor-pointer rounded-full bg-secondary px-3 text-sm font-semibold text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring/30 sm:max-w-44 sm:flex-none"
+      >
+        {props.children}
+      </select>
+    </label>
   );
 }

@@ -79,7 +79,7 @@ Buka http://localhost:3000. Untuk deploy, `DATABASE_URL` diganti dengan connecti
 
 | Halaman | Isi |
 |---|---|
-| `/` | Halaman pembuka: ringkasan singkat dan pintu masuk ke dashboard |
+| `/` | Halaman pembuka: peta titik Indonesia, temuan utama, cara kerja, pintu masuk ke dashboard |
 | `/ringkasan` | Komposisi belanja seluruh daerah dan perubahannya tiap tahun |
 | `/tren` | Fungsi yang porsinya terus naik atau turun |
 | `/pergeseran` | Tahun dan daerah dengan perubahan prioritas paling tajam |
@@ -100,5 +100,5 @@ daerah tertaut ke profilnya, dan setiap grafik punya ikon ⓘ yang menjelaskan i
 | 3 Analitik dan prediksi dengan backtest | selesai |
 | 4 Database + API + halaman Ringkasan Nasional | selesai |
 | 5 Tujuh halaman lainnya + peta choropleth | selesai |
-| Revisi tampilan: landing page, desain minimalis, definisi di tempat | selesai, menunggu tinjauan |
+| Revisi tampilan: landing page, tema biru tua UGM, definisi di tempat | selesai, menunggu tinjauan |
 | 6 Pengujian, dokumentasi, deploy Vercel | – |

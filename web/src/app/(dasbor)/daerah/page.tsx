@@ -1,3 +1,4 @@
+import { ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -11,19 +12,35 @@ export const metadata: Metadata = { title: "Daerah" };
 export default async function CariDaerah() {
   const daftar = await getDaftarPemda();
   const provinsi = daftar.filter((p) => p.tingkat === "provinsi").sort((a, b) => a.nama_pemda.localeCompare(b.nama_pemda));
+  const jumlahDi = (kode: string) => daftar.filter((p) => p.tingkat !== "provinsi" && p.kode_pemda.slice(0, 2) === kode.slice(0, 2)).length;
   return (
     <>
-      <JudulHalaman judul="Daerah" keterangan="Cari provinsi, kabupaten, atau kota untuk melihat profil belanjanya." />
-      <Suspense fallback={<Skeleton className="h-9 max-w-md" />}>
-        <CariPemda daftar={daftar} tujuan="profil" />
-      </Suspense>
-      <section className="pt-4">
-        <h2 className="mb-3 text-sm font-medium">Atau pilih provinsi</h2>
-        <ul className="grid grid-cols-1 gap-x-8 text-sm sm:grid-cols-2 lg:grid-cols-3">
+      <JudulHalaman
+        eyebrow="Daerah"
+        judul="Cari daerah Anda"
+        keterangan="Ketik nama provinsi, kabupaten, atau kota untuk membuka profil belanjanya: komposisi, posisi terhadap daerah setingkat, dan kelompoknya."
+      >
+        <div className="col-span-full max-w-xl">
+          <Suspense fallback={<Skeleton className="h-11 rounded-full bg-white/20" />}>
+            <CariPemda daftar={daftar} tujuan="profil" besar />
+          </Suspense>
+        </div>
+      </JudulHalaman>
+      <section className="rounded-3xl bg-card p-6 sm:p-7">
+        <h2 className="text-base font-bold">Atau mulai dari provinsi</h2>
+        <p className="mt-1 text-[13px] text-muted-foreground">38 provinsi, termasuk empat provinsi baru hasil pemekaran Papua 2022.</p>
+        <ul className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {provinsi.map((p) => (
-            <li key={p.kode_pemda} className="border-b">
-              <Link href={`/daerah/${p.kode_pemda}`} className="block py-2 text-muted-foreground hover:text-foreground">
-                {p.nama_pemda.replace("Provinsi ", "")}
+            <li key={p.kode_pemda}>
+              <Link
+                href={`/daerah/${p.kode_pemda}`}
+                className="group flex items-center justify-between gap-3 rounded-2xl bg-secondary px-4 py-3 text-sm transition-colors hover:bg-[#dfe7f3]"
+              >
+                <span>
+                  <span className="block font-semibold">{p.nama_pemda.replace("Provinsi ", "")}</span>
+                  <span className="block text-xs text-muted-foreground">{jumlahDi(p.kode_pemda)} kabupaten/kota</span>
+                </span>
+                <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" aria-hidden />
               </Link>
             </li>
           ))}

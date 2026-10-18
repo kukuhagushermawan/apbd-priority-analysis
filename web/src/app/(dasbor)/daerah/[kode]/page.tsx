@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CariPemda } from "@/components/cari-pemda";
 import { GrafikPita } from "@/components/grafik";
-import { BarisStatistik, KartuGrafik, KartuKpi, KerangkaMemuat, Peringatan } from "@/components/kartu";
+import { JudulHalaman, KartuGrafik, KerangkaMemuat, kelasTombolGelap, Peringatan, StatJudul } from "@/components/kartu";
 import { GrafikPosisi } from "@/components/profil-grafik";
 import { GrafikKomposisi } from "@/components/ringkasan-grafik";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -39,45 +39,43 @@ async function Isi({ params, searchParams }: { params: PageProps<"/daerah/[kode]
   const klasterAkhir = profil.klaster.at(-1);
   const pendidikan = profil.fungsi.find((f) => f.kode === "10")!;
   const tingkat = pemda.tingkat === "provinsi" ? "provinsi" : pemda.tingkat;
-  const tombol = "inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm hover:bg-muted";
 
   return (
     <>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-1">
-          <p className="text-sm text-muted-foreground">
-            {pemda.tingkat === "provinsi" ? "Provinsi" : pemda.nama_provinsi.replace("Provinsi ", "")}
-            {pemda.kode_2022 && pemda.kode_2022 !== pemda.kode_pemda && " · berpindah provinsi sejak 2023"}
-          </p>
-          <h1 className="text-2xl font-semibold tracking-tight">{pemda.nama_pemda}</h1>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link href={tautan("/bandingkan", filter, { kode: pemda.kode_pemda })} className={tombol}>
-            <Plus className="size-4" aria-hidden /> Bandingkan
-          </Link>
-          <a href={`/api/unduh?kode=${pemda.kode_pemda}`} className={tombol}>
-            <Download className="size-4" aria-hidden /> CSV
-          </a>
-        </div>
-      </div>
-      <Suspense>
-        <CariPemda daftar={daftar} tujuan="profil" placeholder="Cari daerah lain" />
-      </Suspense>
-      {!pemda.panel_seimbang && <Peringatan>Wilayah provinsi ini berubah karena pemekaran Papua 2022, jadi angka antartahun tidak sepenuhnya sebanding.</Peringatan>}
-
-      <BarisStatistik>
-        <KartuKpi label={`Belanja ${tahun}`} nilai={rupiahTriliun(total)} catatan="APBD Anggaran" />
-        <KartuKpi label="Porsi pendidikan" nilai={persen(pendidikan.share[i])} catatan={`Median ${tingkat}: ${persen(pendidikan.median[i])}`} definisi="share" />
-        <KartuKpi
+      <JudulHalaman
+        eyebrow={`${pemda.tingkat === "provinsi" ? "Provinsi" : `${pemda.tingkat[0].toUpperCase()}${pemda.tingkat.slice(1)} · ${pemda.nama_provinsi.replace("Provinsi ", "")}`}${
+          pemda.kode_2022 && pemda.kode_2022 !== pemda.kode_pemda ? " · pindah provinsi sejak 2023" : ""
+        }`}
+        judul={pemda.nama_pemda}
+        aksi={
+          <>
+            <Link href={tautan("/bandingkan", filter, { kode: pemda.kode_pemda })} className={kelasTombolGelap}>
+              <Plus className="size-4" aria-hidden /> Bandingkan
+            </Link>
+            <a href={`/api/unduh?kode=${pemda.kode_pemda}`} className={kelasTombolGelap}>
+              <Download className="size-4" aria-hidden /> CSV
+            </a>
+          </>
+        }
+      >
+        <StatJudul label={`Belanja ${tahun}`} nilai={rupiahTriliun(total)} catatan="APBD Anggaran" />
+        <StatJudul label="Porsi pendidikan" nilai={persen(pendidikan.share[i])} catatan={`Median ${tingkat}: ${persen(pendidikan.median[i])}`} definisi="share" sorot />
+        <StatJudul
           label={`Pergeseran ${tahun}`}
           nilai={ips ? `${ips.ips_pp.toFixed(1).replace(".", ",")} pp` : "–"}
           catatan={ips ? (ips.lonjakan ? "Melonjak dibanding daerah setingkat" : "Dalam batas wajar") : "Belum ada tahun pembanding"}
           definisi="ips"
         />
-        <KartuKpi label="Kelompok (2026)" nilai={klasterAkhir?.nama_klaster.split("· ")[1] ?? "–"} definisi="klaster" />
-      </BarisStatistik>
+        <StatJudul label="Kelompok (2026)" nilai={klasterAkhir?.nama_klaster.split("· ")[1] ?? "–"} definisi="klaster" />
+      </JudulHalaman>
+      <div className="rounded-3xl bg-card p-4">
+        <Suspense>
+          <CariPemda daftar={daftar} tujuan="profil" placeholder="Cari daerah lain" />
+        </Suspense>
+      </div>
+      {!pemda.panel_seimbang && <Peringatan>Wilayah provinsi ini berubah karena pemekaran Papua 2022, jadi angka antartahun tidak sepenuhnya sebanding.</Peringatan>}
 
-      <div className="grid gap-4 xl:grid-cols-2">
+      <div className="grid gap-5 xl:grid-cols-2">
         <KartuGrafik judul="Komposisi belanja" keterangan="Dari tahun ke tahun." definisi="share">
           <GrafikKomposisi tahun={profil.tahun} komposisi={profil.komposisi} />
         </KartuGrafik>
@@ -86,7 +84,7 @@ async function Isi({ params, searchParams }: { params: PageProps<"/daerah/[kode]
         </KartuGrafik>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-2">
+      <div className="grid gap-5 xl:grid-cols-2">
         <KartuGrafik judul="Porsi pendidikan" keterangan="Garis putus-putus: acuan 20% (perkiraan kasar, bukan audit)." definisi="pendidikan">
           <GrafikPita
             sumbuX={profil.tahun.map(String)}
@@ -125,13 +123,13 @@ async function Isi({ params, searchParams }: { params: PageProps<"/daerah/[kode]
         </KartuGrafik>
       </div>
 
-      <p className="text-sm text-muted-foreground">
+      <p className="px-1 text-sm text-muted-foreground">
         Lanjut:{" "}
-        <Link href={tautan("/proyeksi", filter, { kode: pemda.kode_pemda })} className="text-foreground underline-offset-4 hover:underline">
+        <Link href={tautan("/proyeksi", filter, { kode: pemda.kode_pemda })} className="font-semibold text-primary underline-offset-4 hover:underline">
           proyeksi daerah ini
         </Link>
         {" · "}
-        <Link href={`/pergeseran${keQuery({ ...filter, provinsi: pemda.provinsi_induk })}`} className="text-foreground underline-offset-4 hover:underline">
+        <Link href={`/pergeseran${keQuery({ ...filter, provinsi: pemda.provinsi_induk })}`} className="font-semibold text-primary underline-offset-4 hover:underline">
           pergeseran di provinsinya
         </Link>
       </p>

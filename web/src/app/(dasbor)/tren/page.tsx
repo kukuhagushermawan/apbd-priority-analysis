@@ -15,7 +15,11 @@ export const metadata: Metadata = { title: "Tren" };
 export default function Tren({ searchParams }: PageProps<"/tren">) {
   return (
     <>
-      <JudulHalaman judul="Tren" keterangan="Fungsi mana yang porsinya terus naik atau turun sejak 2022." />
+      <JudulHalaman
+        eyebrow="Tren · 2022–2026"
+        judul="Urusan yang terus naik atau turun"
+        keterangan="Porsi tiap fungsi dari tahun ke tahun, dan fungsi mana yang bergerak paling konsisten."
+      />
       <Suspense fallback={<KerangkaMemuat />}>
         <Isi searchParams={searchParams} />
       </Suspense>
@@ -58,7 +62,7 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/tren">["searchP
         />
       </KartuGrafik>
 
-      <div className="grid gap-4 xl:grid-cols-3">
+      <div className="grid gap-5 xl:grid-cols-3">
         <KartuGrafik
           className="xl:col-span-2"
           judul="Naik atau turun per tahun"

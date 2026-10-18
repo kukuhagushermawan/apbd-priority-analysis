@@ -24,8 +24,9 @@ export default function Proyeksi({ searchParams }: PageProps<"/proyeksi">) {
   return (
     <>
       <JudulHalaman
-        judul="Proyeksi 2027–2028"
-        keterangan="Perkiraan porsi belanja kalau pola 2022–2026 berlanjut. Sifatnya eksploratif."
+        eyebrow="Proyeksi · eksploratif"
+        judul="Arah belanja 2027–2028"
+        keterangan="Perkiraan porsi tiap fungsi kalau pola 2022–2026 berlanjut, beserta seberapa mungkin meleset."
       />
       <Peringatan>
         Perkiraan ini bisa meleset jauh kalau batas belanja pegawai 30% dan infrastruktur 40% (UU HKPD) dilonggarkan lewat UU APBN 2027. Model
@@ -63,7 +64,7 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/proyeksi">["sea
 
   return (
     <>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 rounded-3xl bg-card p-5">
         <Suspense>
           <CariPemda daftar={daftar} tujuan="proyeksi" placeholder="Pilih daerah (kosongkan untuk median)" />
         </Suspense>
@@ -103,7 +104,7 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/proyeksi">["sea
         )}
       </KartuGrafik>
 
-      <div className="grid gap-4 xl:grid-cols-2">
+      <div className="grid gap-5 xl:grid-cols-2">
         <KartuGrafik
           judul="Seberapa tepat modelnya?"
           keterangan="Rata-rata meleset (pp) saat menebak 2025 dan 2026. Makin kecil makin baik."

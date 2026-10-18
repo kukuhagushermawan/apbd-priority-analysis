@@ -1,23 +1,53 @@
-import { SearchX } from "lucide-react";
+import { AlertTriangle, SearchX } from "lucide-react";
 import Link from "next/link";
 import { Info } from "@/components/info";
+import { Kawung } from "@/components/kawung";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { KunciDefinisi } from "@/lib/definisi";
 import { cn } from "@/lib/utils";
 
-export function JudulHalaman({ judul, keterangan, aksi }: { judul: string; keterangan?: string; aksi?: React.ReactNode }) {
+/** Panel judul biru tua di atas tiap halaman; children = angka kunci (StatJudul). */
+export function JudulHalaman(props: {
+  judul: string;
+  keterangan?: string;
+  eyebrow?: string;
+  aksi?: React.ReactNode;
+  children?: React.ReactNode;
+}) {
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{judul}</h1>
-        {keterangan && <p className="max-w-2xl text-sm text-muted-foreground">{keterangan}</p>}
+    <section className="relative overflow-hidden rounded-3xl bg-primary px-6 py-7 text-white sm:px-8">
+      <Kawung id="kawung-judul" className="pointer-events-none absolute -top-16 -right-10 size-64 rounded-full opacity-[0.14]" />
+      <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="max-w-3xl">
+          {props.eyebrow && <p className="text-sm text-[#c3cee0]">{props.eyebrow}</p>}
+          <h1 className="mt-1 font-display text-3xl font-bold tracking-tight sm:text-4xl">{props.judul}</h1>
+          {props.keterangan && <p className="mt-2 text-[15px] leading-relaxed text-[#c3cee0]">{props.keterangan}</p>}
+        </div>
+        {props.aksi && <div className="flex shrink-0 flex-wrap gap-2">{props.aksi}</div>}
       </div>
-      {aksi}
+      {props.children && <div className="relative mt-7 grid grid-cols-2 gap-x-6 gap-y-5 lg:grid-cols-4">{props.children}</div>}
+    </section>
+  );
+}
+
+export function StatJudul(props: { label: string; nilai: string; catatan?: React.ReactNode; definisi?: KunciDefinisi; sorot?: boolean }) {
+  return (
+    <div className="min-w-0">
+      <div className="flex items-center gap-1.5">
+        <p className="text-[13px] text-[#c3cee0]">{props.label}</p>
+        {props.definisi && <Info id={props.definisi} gelap />}
+      </div>
+      <p className={cn("mt-1 text-2xl font-bold tracking-tight sm:text-3xl", props.sorot && "text-accent")}>{props.nilai}</p>
+      {props.catatan && <div className="mt-0.5 text-[13px] text-[#8ea3c6]">{props.catatan}</div>}
     </div>
   );
 }
 
-/** Panel grafik/tabel. definisi = kunci istilah yang bisa dibuka lewat ikon ⓘ. */
+/** Tombol di panel judul (Bandingkan, CSV, dst.). */
+export const kelasTombolGelap =
+  "inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20";
+
+/** Kartu putih untuk grafik/tabel. definisi = istilah yang bisa dibuka lewat ikon ⓘ. */
 export function KartuGrafik(props: {
   judul: string;
   keterangan?: string;
@@ -27,13 +57,13 @@ export function KartuGrafik(props: {
   className?: string;
 }) {
   return (
-    <section className={cn("rounded-xl border bg-card p-5", props.className)}>
-      <header className="mb-4 flex items-start justify-between gap-3">
-        <div className="space-y-0.5">
-          <h2 className="text-sm font-semibold">{props.judul}</h2>
-          {props.keterangan && <p className="text-xs text-muted-foreground">{props.keterangan}</p>}
+    <section className={cn("rounded-3xl bg-card p-6 sm:p-7", props.className)}>
+      <header className="mb-5 flex items-start justify-between gap-3">
+        <div className="space-y-1">
+          <h2 className="text-base font-bold">{props.judul}</h2>
+          {props.keterangan && <p className="text-[13px] leading-relaxed text-muted-foreground">{props.keterangan}</p>}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           {props.aksi}
           {props.definisi && <Info id={props.definisi} />}
         </div>
@@ -43,31 +73,9 @@ export function KartuGrafik(props: {
   );
 }
 
-/** Deret angka kunci dalam satu bingkai, dipisah garis tipis. */
-export function BarisStatistik({ children }: { children: React.ReactNode }) {
-  return (
-    <section className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border lg:grid-cols-4">
-      {children}
-    </section>
-  );
-}
-
-export function KartuKpi(props: { label: string; nilai: string; catatan?: React.ReactNode; definisi?: KunciDefinisi }) {
-  return (
-    <div className="space-y-1 bg-card p-5">
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-xs text-muted-foreground">{props.label}</p>
-        {props.definisi && <Info id={props.definisi} />}
-      </div>
-      <p className="text-2xl font-semibold tracking-tight">{props.nilai}</p>
-      {props.catatan && <div className="text-xs text-muted-foreground">{props.catatan}</div>}
-    </div>
-  );
-}
-
 export function Kosong({ pesan }: { pesan: string }) {
   return (
-    <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed p-10 text-center text-sm text-muted-foreground">
+    <div className="flex flex-col items-center gap-2 rounded-3xl bg-card p-12 text-center text-sm text-muted-foreground">
       <SearchX className="size-5" aria-hidden />
       {pesan}
     </div>
@@ -76,29 +84,32 @@ export function Kosong({ pesan }: { pesan: string }) {
 
 export function KerangkaMemuat() {
   return (
-    <div className="space-y-4" aria-busy aria-label="Memuat data">
-      <Skeleton className="h-28 rounded-xl" />
-      <div className="grid gap-4 xl:grid-cols-2">
-        <Skeleton className="h-96 rounded-xl" />
-        <Skeleton className="h-96 rounded-xl" />
+    <div className="space-y-5" aria-busy aria-label="Memuat data">
+      <Skeleton className="h-40 rounded-3xl bg-white/70" />
+      <div className="grid gap-5 xl:grid-cols-2">
+        <Skeleton className="h-96 rounded-3xl bg-white/70" />
+        <Skeleton className="h-96 rounded-3xl bg-white/70" />
       </div>
     </div>
   );
 }
 
-/** Pilihan berupa tautan (periode, Share/Nominal, dst.); nilainya tersimpan di URL. */
+/** Pilihan berbentuk pill; nilainya tersimpan di URL. */
 export function PilihanTautan({ label, pilihan }: { label: string; pilihan: { teks: string; href: string; aktif: boolean }[] }) {
   return (
     <div className="flex items-center gap-2 text-xs" role="group" aria-label={label}>
       <span className="text-muted-foreground">{label}</span>
-      <div className="inline-flex rounded-lg bg-muted p-0.5">
+      <div className="inline-flex rounded-full bg-secondary p-1">
         {pilihan.map((p) => (
           <Link
             key={p.teks}
             href={p.href}
             scroll={false}
             aria-current={p.aktif ? "true" : undefined}
-            className={cn("rounded-md px-2.5 py-1 transition-colors", p.aktif ? "bg-card font-medium shadow-xs" : "text-muted-foreground hover:text-foreground")}
+            className={cn(
+              "rounded-full px-3 py-1.5 font-medium transition-colors",
+              p.aktif ? "bg-primary text-white" : "text-muted-foreground hover:text-foreground",
+            )}
           >
             {p.teks}
           </Link>
@@ -109,14 +120,24 @@ export function PilihanTautan({ label, pilihan }: { label: string; pilihan: { te
 }
 
 export function Peringatan({ children }: { children: React.ReactNode }) {
-  return <p className="border-l-2 border-amber-400 py-1 pl-3 text-xs leading-relaxed text-muted-foreground">{children}</p>;
+  return (
+    <div className="flex gap-3 rounded-2xl bg-[#fff4cf] px-5 py-3.5 text-sm leading-relaxed text-[#6b4a00]">
+      <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
+      <div>{children}</div>
+    </div>
+  );
 }
 
-/** Nama daerah selalu menaut ke Profil Daerah. */
+/** Nama daerah selalu menaut ke profilnya. */
 export function TautanPemda({ kode, nama, query = "" }: { kode: string; nama: string; query?: string }) {
   return (
-    <Link href={`/daerah/${kode}${query}`} className="font-medium underline-offset-4 hover:underline">
+    <Link href={`/daerah/${kode}${query}`} className="font-semibold text-primary underline-offset-4 hover:underline">
       {nama}
     </Link>
   );
+}
+
+/** Label kecil "melonjak" dan sejenisnya. */
+export function Lencana({ children }: { children: React.ReactNode }) {
+  return <span className="ml-2 rounded-full bg-[#fff4cf] px-2 py-0.5 text-[11px] font-semibold text-[#8a5a00]">{children}</span>;
 }

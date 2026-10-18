@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Bricolage_Grotesque, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
-const font = Plus_Jakarta_Sans({ variable: "--font-sans", subsets: ["latin"] });
+const sans = Plus_Jakarta_Sans({ variable: "--font-sans", subsets: ["latin"] });
+const display = Bricolage_Grotesque({ variable: "--font-display", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: { default: "Peta Belanja Daerah", template: "%s · Peta Belanja Daerah" },
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="id" className={`${font.variable} antialiased`}>
+    <html lang="id" className={`${sans.variable} ${display.variable} antialiased`}>
       <body className="min-h-screen">{children}</body>
     </html>
   );

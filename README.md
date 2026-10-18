@@ -12,7 +12,10 @@ data/raw (xlsx DJPK)
    │  langkah 2: analisis    Δshare, tren, Indeks Pergeseran Struktur, klaster
    │  langkah 3: prediksi    proyeksi 2027-2028 + backtest
    ▼
-data/processed (parquet)  ──►  web/ dashboard (menyusul)
+data/processed (parquet)
+   │  langkah 4: muat db     isi PostgreSQL
+   ▼
+web/ dashboard (Next.js + Prisma + ECharts)
 ```
 
 ## Struktur
@@ -25,12 +28,20 @@ pipeline/
   langkah1_bersihkan.py
   langkah2_analisis.py
   langkah3_prediksi.py
+  langkah4_muat_db.py         memuat hasil ke PostgreSQL
   run.py                      menjalankan langkah 1-3
   test_rumus.py               uji rumus
+web/
+  prisma/schema.prisma        skema database (11 tabel)
+  src/app/                    halaman + API (/api/ringkasan, /api/unduh)
+  src/components/             sidebar, filter, grafik ECharts
+  src/lib/data.ts             kueri database
 docs/metodologi.md            temuan data, rumus, hasil backtest, keputusan
 ```
 
 ## Menjalankan
+
+Pipeline data (Python):
 
 ```bash
 pip install -r pipeline/requirements.txt
@@ -38,12 +49,35 @@ python -m pipeline.run
 python -m pytest pipeline
 ```
 
+Dashboard (Node.js 20+). Database lokal memakai PostgreSQL tanpa Docker (`npm run db`, biarkan terminalnya
+terbuka):
+
+```bash
+cd web
+npm install
+cp .env.example .env
+npm run db
+```
+
+Di terminal kedua:
+
+```bash
+cd web
+npx prisma db push
+cd ..
+python -m pipeline.langkah4_muat_db
+cd web
+npm run dev
+```
+
+Buka http://localhost:3000. Untuk deploy, `DATABASE_URL` diganti dengan connection string Neon/Supabase.
+
 ## Status
 
 | Milestone | Status |
 |---|---|
 | 1–2 Data: audit format, standardisasi, share, validasi | selesai |
-| 3 Analitik dan prediksi dengan backtest | selesai, menunggu tinjauan |
-| 4 Database + API + halaman Ringkasan Nasional | berikutnya |
+| 3 Analitik dan prediksi dengan backtest | selesai |
+| 4 Database + API + halaman Ringkasan Nasional | selesai, menunggu tinjauan |
 | 5 Tujuh halaman lainnya | – |
 | 6 Pengujian, dokumentasi, deploy Vercel | – |

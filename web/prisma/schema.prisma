@@ -1,0 +1,144 @@
+// Skema database. Tabel diisi oleh pipeline/langkah4_muat_db.py.
+// Nama kolom sama dengan keluaran pipeline (snake_case).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model dim_pemda {
+  kode_pemda     String  @id
+  nama_pemda     String
+  tingkat        String // provinsi | kabupaten | kota
+  provinsi_induk String
+  nama_provinsi  String
+  kode_2022      String?
+  panel_seimbang Boolean
+
+  fakta fakta_anggaran[]
+}
+
+model dim_fungsi {
+  kode_fungsi String @id
+  nama_fungsi String
+  aktif       Boolean
+  grup_grafik String // 01,04,06,07,10 atau LN (Lainnya) untuk grafik komposisi
+
+  fakta fakta_anggaran[]
+}
+
+model fakta_anggaran {
+  tahun          Int
+  kode_pemda     String
+  kode_fungsi    String
+  provinsi_induk String // provinsi pada tahun tsb (berbeda untuk Papua 2022)
+  nilai_anggaran Float
+  total_belanja  Float
+
+  pemda  dim_pemda  @relation(fields: [kode_pemda], references: [kode_pemda])
+  fungsi dim_fungsi @relation(fields: [kode_fungsi], references: [kode_fungsi])
+
+  @@id([tahun, kode_pemda, kode_fungsi])
+}
+
+model share_fungsi {
+  tahun               Int
+  kode_pemda          String
+  kode_fungsi         String
+  share_pct           Float
+  delta_pp            Float?
+  patahan_klasifikasi Boolean
+
+  @@id([tahun, kode_pemda, kode_fungsi])
+  @@index([kode_fungsi, tahun])
+}
+
+model tren_fungsi {
+  periode       String // 2022-2026 | 2023-2026
+  kode_pemda    String
+  kode_fungsi   String
+  kemiringan_pp Float
+  kategori      String // naik | turun | stabil
+  ambang_pp     Float
+
+  @@id([periode, kode_pemda, kode_fungsi])
+}
+
+model ips_pergeseran {
+  tahun               Int
+  kode_pemda          String
+  kelompok            String
+  ips_pp              Float
+  z_robust            Float
+  lonjakan            Boolean
+  patahan_klasifikasi Boolean
+
+  @@id([tahun, kode_pemda])
+}
+
+model klaster {
+  tahun               Int
+  kode_pemda          String
+  kelompok            String // provinsi | kabkota
+  klaster             Int
+  nama_klaster        String
+  k                   Int
+  silhouette          Float
+  patahan_klasifikasi Boolean
+
+  @@id([tahun, kode_pemda])
+}
+
+model klaster_centroid {
+  kelompok                String
+  klaster                 Int
+  komponen                String
+  nama_klaster            String
+  share_pct               Float
+  share_rata_kelompok_pct Float
+
+  @@id([kelompok, klaster, komponen])
+}
+
+model proyeksi {
+  tahun                Int
+  kode_pemda           String
+  kode_fungsi          String
+  share_pct            Float
+  batas_bawah_pct      Float
+  batas_atas_pct       Float
+  model                String
+  periode_latih        String
+  mengalahkan_baseline Boolean
+
+  @@id([tahun, kode_pemda, kode_fungsi])
+}
+
+model metrik_backtest {
+  id          Int    @id @default(autoincrement())
+  tingkat     String
+  periode     String
+  model       String
+  tahun_uji   Int
+  kode_fungsi String // kode fungsi atau SEMUA
+  mae_pp      Float
+  mape_pct    Float?
+  n           Int
+  terpilih    Boolean
+}
+
+model log_validasi {
+  id            Int     @id @default(autoincrement())
+  tahun         Int
+  kode_pemda    String?
+  pemeriksaan   String
+  nilai_harapan Float?
+  nilai_aktual  Float?
+  selisih_rp    Float?
+  selisih_pct   Float?
+  status        String
+}

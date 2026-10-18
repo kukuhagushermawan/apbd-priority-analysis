@@ -141,3 +141,21 @@ Uji rumus ada di `pipeline/test_rumus.py` dan dijalankan dengan `python -m pytes
 mencakup:
 - rumus share, Δshare, IPS, kemiringan, z robust, CLR, proyeksi, dan pemilihan model;
 - satu uji atas data asli.
+
+## 7. Peta choropleth
+
+Batas wilayah memakai geoBoundaries Indonesia ADM2 versi disederhanakan: 519 wilayah, kondisi 2020, data
+BPS/WFP/OCHA ROAP, lisensi CC BY 3.0 IGO. Detail sumber dan hash berkas ada di `data/peta/SUMBER.md`.
+
+Pemekaran Papua 2022 tidak mengubah batas kabupaten/kota, sehingga data 2020 tetap sesuai.
+
+`python -m pipeline.cocokkan_peta` mencocokkan nama wilayah peta ke kode DJPK:
+- **Otomatis:** pencocokan nama tanpa awalan "Kab.", dengan spasi dan tanda baca diabaikan.
+- **Manual:** 10 padanan untuk nama yang sudah berganti, misalnya Mamuju Utara → Pasangkayu, Maluku
+  Tenggara Barat → Kepulauan Tanimbar, Toba Samosir → Toba, dan "Kota Baru" → Kab. Kotabaru.
+
+Hasilnya 508 dari 508 kab/kota cocok satu-satu. Sebanyak 11 wilayah peta tidak punya APBD sendiri
+(kota/kab administrasi DKI, danau, waduk, hutan) dan digambar abu-abu.
+
+Pada mode klaster provinsi, setiap kab/kota diwarnai menurut klaster provinsinya, sehingga 4 provinsi baru Papua tetap
+tergambar.

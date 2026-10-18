@@ -1,12 +1,12 @@
-import { MapPinned } from "lucide-react";
 import { Suspense } from "react";
 import { JudulHalaman, KartuGrafik, KerangkaMemuat, Kosong, Peringatan, PilihanTautan, TautanPemda } from "@/components/kartu";
 import { GrafikCentroid, GrafikSankey } from "@/components/klaster-grafik";
+import { PetaKlaster } from "@/components/peta-klaster";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getKlaster } from "@/lib/data";
 import { bacaFilter, keQuery, tautan } from "@/lib/filter";
 
-export default function PetaKlaster({ searchParams }: PageProps<"/klaster">) {
+export default function HalamanKlaster({ searchParams }: PageProps<"/klaster">) {
   return (
     <>
       <JudulHalaman
@@ -132,11 +132,12 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/klaster">["sear
         </KartuGrafik>
       </div>
 
-      <KartuGrafik judul="Peta choropleth klaster 2026" keterangan="Warna wilayah = klaster pemda." definisi="klaster">
-        <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-          <MapPinned className="size-6" aria-hidden />
-          Peta menunggu berkas GeoJSON batas wilayah kabupaten/kota yang dipetakan ke kode DJPK lewat tabel crosswalk.
-        </div>
+      <KartuGrafik
+        judul={`Peta klaster ${kelompok === "provinsi" ? "provinsi" : "kabupaten/kota"} 2026`}
+        keterangan={kelompok === "provinsi" ? "Setiap kabupaten/kota diwarnai menurut klaster provinsinya." : "Warna wilayah = klaster struktur belanja Anggaran pemda."}
+        definisi="klaster"
+      >
+        <PetaKlaster klaster={data.klaster} anggota={data.anggota2026} modeProvinsi={kelompok === "provinsi"} query={q} />
       </KartuGrafik>
     </>
   );

@@ -1,8 +1,9 @@
 "use client";
 
 // Pembungkus Apache ECharts: hanya modul yang dipakai yang dimuat.
-import { BarChart, HeatmapChart, LineChart, SankeyChart } from "echarts/charts";
+import { BarChart, HeatmapChart, LineChart, MapChart, SankeyChart } from "echarts/charts";
 import {
+  GeoComponent,
   GridComponent,
   LegendComponent,
   MarkAreaComponent,
@@ -18,7 +19,9 @@ echarts.use([
   BarChart,
   HeatmapChart,
   LineChart,
+  MapChart,
   SankeyChart,
+  GeoComponent,
   GridComponent,
   LegendComponent,
   MarkAreaComponent,
@@ -29,6 +32,11 @@ echarts.use([
 ]);
 
 export type OpsiGrafik = echarts.EChartsCoreOption;
+
+/** Daftarkan GeoJSON sebagai peta ECharts (sekali saja per nama). */
+export function daftarkanPeta(nama: string, geojson: object) {
+  if (!echarts.getMap(nama)) echarts.registerMap(nama, geojson as Parameters<typeof echarts.registerMap>[1]);
+}
 
 // Palet kategori tervalidasi (aman buta warna untuk seri bersebelahan); "Lainnya"/pembanding abu-abu netral.
 export const WARNA_SERI = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300"];
@@ -138,7 +146,13 @@ export function GrafikPita(props: {
         },
       },
       xAxis: { type: "category", data: sumbuX, boundaryGap: false, ...SUMBU, splitLine: { show: false } },
-      yAxis: { type: "value", scale: true, ...SUMBU, axisLabel: { color: TEKS, formatter: satuan === "%" ? "{value}%" : `{value}` } },
+      yAxis: {
+        type: "value",
+        scale: true,
+        ...(acuan ? { min: (v: { min: number }) => Math.floor(Math.min(v.min, acuan.nilai) - 1) } : {}),
+        ...SUMBU,
+        axisLabel: { color: TEKS, formatter: satuan === "%" ? "{value}%" : `{value}` },
+      },
       series: [
         ...pita,
         {

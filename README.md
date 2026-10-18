@@ -22,6 +22,7 @@ web/ dashboard (Next.js + Prisma + ECharts)
 
 ```
 data/raw/                     data asli DJPK 2022-2026
+data/peta/                    batas kab/kota geoBoundaries (CC BY 3.0 IGO), lihat SUMBER.md
 pipeline/
   config.yaml                 lokasi sheet per tahun, kamus fungsi, kode pemekaran Papua
   crosswalk_pemda.csv         daftar 546 pemda
@@ -29,6 +30,7 @@ pipeline/
   langkah2_analisis.py
   langkah3_prediksi.py
   langkah4_muat_db.py         memuat hasil ke PostgreSQL
+  cocokkan_peta.py            mencocokkan wilayah peta ke kode DJPK -> web/public/peta
   run.py                      menjalankan langkah 1-3
   test_rumus.py               uji rumus
 web/
@@ -96,5 +98,5 @@ pemda tertaut ke Profil Daerah.
 | 1–2 Data: audit format, standardisasi, share, validasi | selesai |
 | 3 Analitik dan prediksi dengan backtest | selesai |
 | 4 Database + API + halaman Ringkasan Nasional | selesai |
-| 5 Tujuh halaman lainnya | selesai, menunggu tinjauan (peta choropleth menunggu GeoJSON) |
+| 5 Tujuh halaman lainnya + peta choropleth | selesai, menunggu tinjauan |
 | 6 Pengujian, dokumentasi, deploy Vercel | – |

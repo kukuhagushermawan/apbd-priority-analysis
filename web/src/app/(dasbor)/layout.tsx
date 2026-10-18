@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { FilterBar } from "@/components/filter-bar";
-import { Logo } from "@/components/kawung";
+import { Logo } from "@/components/logo";
 import { NavigasiMobile, Sidebar } from "@/components/navigasi";
 import { getDaftarProvinsi } from "@/lib/data";
 
@@ -29,7 +29,7 @@ export default async function LayoutDasbor({ children }: LayoutProps<"/">) {
         </header>
         <main className="mx-auto w-full max-w-7xl flex-1 space-y-5 px-4 pt-3 pb-10 sm:px-8">{children}</main>
         <footer className="mx-auto w-full max-w-7xl px-4 pb-8 text-xs text-muted-foreground sm:px-8">
-          Data: APBD status anggaran, DJPK Kemenkeu · Computer Science UGM 2026 · Capstone Project
+          Capstone Project
         </footer>
       </div>
     </div>

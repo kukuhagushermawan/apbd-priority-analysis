@@ -10,7 +10,7 @@ export function Info({ id, gelap = false }: { id: KunciDefinisi; gelap?: boolean
   return (
     <Popover>
       <PopoverTrigger
-        aria-label={`Apa itu ${d.judul}?`}
+        aria-label={`Penjelasan ${d.judul}`}
         className={cn(
           "inline-flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors",
           gelap ? "size-5 bg-white/15 text-[11px] text-white hover:bg-white/25" : "bg-secondary text-[#3e5478] hover:bg-[#dfe7f3]",

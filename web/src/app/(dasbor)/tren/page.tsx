@@ -17,8 +17,8 @@ export default function Tren({ searchParams }: PageProps<"/tren">) {
     <>
       <JudulHalaman
         eyebrow="Tren · 2022–2026"
-        judul="Urusan yang terus naik atau turun"
-        keterangan="Porsi tiap fungsi dari tahun ke tahun, dan fungsi mana yang bergerak paling konsisten."
+        judul="Fungsi yang porsinya terus meningkat atau menurun"
+        keterangan="Porsi setiap fungsi dari tahun ke tahun serta fungsi yang perubahannya paling konsisten."
       />
       <Suspense fallback={<KerangkaMemuat />}>
         <Isi searchParams={searchParams} />
@@ -33,7 +33,7 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/tren">["searchP
   const periode = bacaPeriode(typeof sp.periode === "string" ? sp.periode : null);
   const fungsi = filter.fungsi ?? "10";
   const data = await getTren(filter, fungsi, periode);
-  if (!data.deret.length) return <Kosong pesan="Tidak ada daerah yang cocok dengan filter ini." />;
+  if (!data.deret.length) return <Kosong pesan="Tidak ada daerah yang sesuai dengan filter ini." />;
 
   const sumbuX = ["2022", "2023", "2024", "2025", "2026", "2027"];
   const ambil = (k: "p25" | "median" | "p75") => sumbuX.map((t) => data.deret.find((d) => String(d.tahun) === t)?.[k] ?? null);
@@ -42,8 +42,8 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/tren">["searchP
   return (
     <>
       <KartuGrafik
-        judul={`Porsi ${data.namaFungsi.toLowerCase()} di APBD daerah`}
-        keterangan="Garis: daerah di tengah-tengah (median). Area: separuh daerah berada di rentang ini."
+        judul={`Porsi fungsi ${data.namaFungsi.toLowerCase()} dalam APBD daerah`}
+        keterangan="Garis menunjukkan nilai tengah (median). Area menunjukkan rentang tempat separuh daerah berada."
         definisi="share"
       >
         <GrafikPita
@@ -52,21 +52,21 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/tren">["searchP
           namaGaris="Median"
           bawah={ambil("p25")}
           atas={ambil("p75")}
-          namaPita="Separuh daerah"
+          namaPita="Rentang separuh daerah"
           anotasi={[
             { x: "2022", teks: "UU HKPD" },
-            { x: "2023", teks: "Klasifikasi berubah" },
-            { x: "2027", teks: "Batas belanja dilonggarkan?" },
+            { x: "2023", teks: "Perubahan klasifikasi" },
+            { x: "2027", teks: "Potensi relaksasi batas belanja" },
           ]}
-          label={`Tren porsi anggaran ${data.namaFungsi} 2022-2026`}
+          label={`Tren porsi anggaran fungsi ${data.namaFungsi} tahun 2022–2026`}
         />
       </KartuGrafik>
 
       <div className="grid gap-5 xl:grid-cols-3">
         <KartuGrafik
           className="xl:col-span-2"
-          judul="Naik atau turun per tahun"
-          keterangan="Pilih fungsi untuk melihat grafiknya di atas."
+          judul="Rata-rata perubahan porsi per tahun"
+          keterangan="Pilih salah satu fungsi untuk menampilkan grafiknya di atas."
           definisi="tren"
           aksi={
             <PilihanTautan
@@ -80,8 +80,8 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/tren">["searchP
               <TableRow>
                 <TableHead>Fungsi</TableHead>
                 <TableHead className="text-right">Per tahun</TableHead>
-                <TableHead className="hidden text-right sm:table-cell">Daerah naik</TableHead>
-                <TableHead className="hidden text-right sm:table-cell">Turun</TableHead>
+                <TableHead className="hidden text-right sm:table-cell">Daerah meningkat</TableHead>
+                <TableHead className="hidden text-right sm:table-cell">Daerah menurun</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -101,9 +101,9 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/tren">["searchP
           </Table>
         </KartuGrafik>
 
-        <KartuGrafik judul={`${data.namaFungsi}: paling cepat berubah`} keterangan={`Per tahun, ${periode.replace("-", "–")}.`} definisi="tren">
-          <DaftarEkstrem judul="Naik" baris={data.naik} query={q} />
-          <DaftarEkstrem judul="Turun" baris={data.turun} query={q} />
+        <KartuGrafik judul={`${data.namaFungsi}: daerah dengan perubahan tercepat`} keterangan={`Perubahan per tahun, periode ${periode.replace("-", "–")}.`} definisi="tren">
+          <DaftarEkstrem judul="Meningkat" baris={data.naik} query={q} />
+          <DaftarEkstrem judul="Menurun" baris={data.turun} query={q} />
         </KartuGrafik>
       </div>
     </>

@@ -53,7 +53,7 @@ export function CariPemda({ daftar, tujuan, placeholder = "Cari provinsi, kabupa
       </label>
       {q.length >= 2 && (
         <ul className="absolute z-20 mt-2 w-full overflow-hidden rounded-2xl bg-popover py-1 text-foreground shadow-[0_16px_40px_-12px_rgba(11,45,91,0.35)]">
-          {hasil.length === 0 && <li className="px-4 py-2.5 text-sm text-muted-foreground">Tidak ada daerah dengan nama itu.</li>}
+          {hasil.length === 0 && <li className="px-4 py-2.5 text-sm text-muted-foreground">Daerah dengan nama tersebut tidak ditemukan.</li>}
           {hasil.map((p) => (
             <li key={p.kode_pemda}>
               <Link href={href(p.kode_pemda)} onClick={() => setKata("")} className="block px-4 py-2.5 text-sm hover:bg-secondary">

@@ -10,6 +10,7 @@ import { GrafikKomposisi } from "@/components/ringkasan-grafik";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getDaftarPemda, getProfil } from "@/lib/data";
 import { bacaFilter, keQuery, tautan } from "@/lib/filter";
+import { namaKlaster } from "@/lib/fungsi";
 import { persen, pp, rupiahTriliun } from "@/lib/format";
 
 export async function generateMetadata({ params }: PageProps<"/daerah/[kode]">) {
@@ -44,7 +45,7 @@ async function Isi({ params, searchParams }: { params: PageProps<"/daerah/[kode]
     <>
       <JudulHalaman
         eyebrow={`${pemda.tingkat === "provinsi" ? "Provinsi" : `${pemda.tingkat[0].toUpperCase()}${pemda.tingkat.slice(1)} · ${pemda.nama_provinsi.replace("Provinsi ", "")}`}${
-          pemda.kode_2022 && pemda.kode_2022 !== pemda.kode_pemda ? " · pindah provinsi sejak 2023" : ""
+          pemda.kode_2022 && pemda.kode_2022 !== pemda.kode_pemda ? " · berpindah provinsi sejak 2023" : ""
         }`}
         judul={pemda.nama_pemda}
         aksi={
@@ -53,51 +54,51 @@ async function Isi({ params, searchParams }: { params: PageProps<"/daerah/[kode]
               <Plus className="size-4" aria-hidden /> Bandingkan
             </Link>
             <a href={`/api/unduh?kode=${pemda.kode_pemda}`} className={kelasTombolGelap}>
-              <Download className="size-4" aria-hidden /> CSV
+              <Download className="size-4" aria-hidden /> Unduh CSV
             </a>
           </>
         }
       >
-        <StatJudul label={`Belanja ${tahun}`} nilai={rupiahTriliun(total)} catatan="APBD Anggaran" />
-        <StatJudul label="Porsi pendidikan" nilai={persen(pendidikan.share[i])} catatan={`Median ${tingkat}: ${persen(pendidikan.median[i])}`} definisi="share" sorot />
+        <StatJudul label={`Total belanja ${tahun}`} nilai={rupiahTriliun(total)} catatan="APBD status anggaran" />
+        <StatJudul label="Porsi fungsi pendidikan" nilai={persen(pendidikan.share[i])} catatan={`Median ${tingkat}: ${persen(pendidikan.median[i])}`} definisi="share" sorot />
         <StatJudul
           label={`Pergeseran ${tahun}`}
           nilai={ips ? `${ips.ips_pp.toFixed(1).replace(".", ",")} pp` : "–"}
-          catatan={ips ? (ips.lonjakan ? "Melonjak dibanding daerah setingkat" : "Dalam batas wajar") : "Belum ada tahun pembanding"}
+          catatan={ips ? (ips.lonjakan ? "Melonjak dibandingkan dengan daerah setingkat" : "Masih dalam batas wajar") : "Belum ada tahun pembanding"}
           definisi="ips"
         />
-        <StatJudul label="Kelompok (2026)" nilai={klasterAkhir?.nama_klaster.split("· ")[1] ?? "–"} definisi="klaster" />
+        <StatJudul label="Kelompok (2026)" nilai={klasterAkhir ? namaKlaster(klasterAkhir.nama_klaster) : "–"} definisi="klaster" />
       </JudulHalaman>
       <div className="rounded-3xl bg-card p-4">
         <Suspense>
           <CariPemda daftar={daftar} tujuan="profil" placeholder="Cari daerah lain" />
         </Suspense>
       </div>
-      {!pemda.panel_seimbang && <Peringatan>Wilayah provinsi ini berubah karena pemekaran Papua 2022, jadi angka antartahun tidak sepenuhnya sebanding.</Peringatan>}
+      {!pemda.panel_seimbang && <Peringatan>Wilayah provinsi ini berubah akibat pemekaran Papua tahun 2022 sehingga angka antartahun tidak sepenuhnya sebanding.</Peringatan>}
 
       <div className="grid gap-5 xl:grid-cols-2">
-        <KartuGrafik judul="Komposisi belanja" keterangan="Dari tahun ke tahun." definisi="share">
+        <KartuGrafik judul="Komposisi belanja" keterangan="Komposisi belanja daerah ini dari tahun ke tahun." definisi="share">
           <GrafikKomposisi tahun={profil.tahun} komposisi={profil.komposisi} />
         </KartuGrafik>
-        <KartuGrafik judul={`Dibanding ${tingkat} lain, ${tahun}`} keterangan="Biru: daerah ini. Abu-abu: median daerah setingkat." definisi="share">
+        <KartuGrafik judul={`Dibandingkan dengan ${tingkat} lain, ${tahun}`} keterangan="Biru menunjukkan daerah ini, abu-abu menunjukkan median daerah setingkat." definisi="share">
           <GrafikPosisi nama={pemda.nama_pemda} fungsi={profil.fungsi.map((f) => ({ nama: f.nama, pemda: f.share[i], median: f.median[i] }))} />
         </KartuGrafik>
       </div>
 
       <div className="grid gap-5 xl:grid-cols-2">
-        <KartuGrafik judul="Porsi pendidikan" keterangan="Garis putus-putus: acuan 20% (perkiraan kasar, bukan audit)." definisi="pendidikan">
+        <KartuGrafik judul="Porsi fungsi pendidikan" keterangan="Garis acuan menunjukkan batas 20% (pembanding kasar, bukan hasil audit)." definisi="pendidikan">
           <GrafikPita
             sumbuX={profil.tahun.map(String)}
             garis={pendidikan.share}
             namaGaris="Pendidikan"
             acuan={{ nilai: 20, label: "20%" }}
-            label="Porsi anggaran pendidikan dibanding acuan 20 persen"
+            label="Porsi anggaran pendidikan dibandingkan dengan acuan 20 persen"
             tinggi={300}
           />
         </KartuGrafik>
         <KartuGrafik
-          judul="Dibanding rata-rata kelompoknya"
-          keterangan={klasterAkhir ? `Kelompok “${klasterAkhir.nama_klaster.split("· ")[1]}”, 2026.` : undefined}
+          judul="Dibandingkan dengan rata-rata kelompoknya"
+          keterangan={klasterAkhir ? `Kelompok “${namaKlaster(klasterAkhir.nama_klaster)}”, tahun 2026.` : undefined}
           definisi="klaster"
         >
           <Table>
@@ -124,13 +125,13 @@ async function Isi({ params, searchParams }: { params: PageProps<"/daerah/[kode]
       </div>
 
       <p className="px-1 text-sm text-muted-foreground">
-        Lanjut:{" "}
+        Lihat juga:{" "}
         <Link href={tautan("/proyeksi", filter, { kode: pemda.kode_pemda })} className="font-semibold text-primary underline-offset-4 hover:underline">
-          proyeksi daerah ini
+          proyeksi belanja daerah ini
         </Link>
         {" · "}
         <Link href={`/pergeseran${keQuery({ ...filter, provinsi: pemda.provinsi_induk })}`} className="font-semibold text-primary underline-offset-4 hover:underline">
-          pergeseran di provinsinya
+          pergeseran belanja di provinsinya
         </Link>
       </p>
     </>

@@ -4,7 +4,7 @@ import { Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { Kawung, Logo } from "@/components/kawung";
+import { Logo } from "@/components/logo";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
@@ -14,9 +14,9 @@ export const HALAMAN = [
   { href: "/pergeseran", label: "Pergeseran" },
   { href: "/daerah", label: "Daerah" },
   { href: "/bandingkan", label: "Bandingkan" },
-  { href: "/klaster", label: "Klaster & peta" },
+  { href: "/klaster", label: "Klaster dan Peta" },
   { href: "/proyeksi", label: "Proyeksi" },
-  { href: "/data", label: "Data & metodologi" },
+  { href: "/data", label: "Data dan Metodologi" },
 ];
 
 function DaftarMenu({ onPilih }: { onPilih?: () => void }) {
@@ -58,11 +58,8 @@ function Merek() {
 function Kaki() {
   return (
     <div className="mt-auto p-6">
-      <Kawung id="kawung-sisi" className="h-10 w-full opacity-30" />
       <p className="mt-4 text-xs leading-relaxed text-[#8ea3c6]">
-        Computer Science UGM 2026
-        <br />
-        Capstone Project
+        Computer Science 2026
       </p>
     </div>
   );

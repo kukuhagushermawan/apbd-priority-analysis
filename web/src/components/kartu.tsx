@@ -1,7 +1,6 @@
 import { AlertTriangle, SearchX } from "lucide-react";
 import Link from "next/link";
 import { Info } from "@/components/info";
-import { Kawung } from "@/components/kawung";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { KunciDefinisi } from "@/lib/definisi";
 import { cn } from "@/lib/utils";
@@ -16,7 +15,6 @@ export function JudulHalaman(props: {
 }) {
   return (
     <section className="relative overflow-hidden rounded-3xl bg-primary px-6 py-7 text-white sm:px-8">
-      <Kawung id="kawung-judul" className="pointer-events-none absolute -top-16 -right-10 size-64 rounded-full opacity-[0.14]" />
       <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="max-w-3xl">
           {props.eyebrow && <p className="text-sm text-[#c3cee0]">{props.eyebrow}</p>}
@@ -57,7 +55,7 @@ export function KartuGrafik(props: {
   className?: string;
 }) {
   return (
-    <section className={cn("rounded-3xl bg-card p-6 sm:p-7", props.className)}>
+    <section className={cn("min-w-0 rounded-3xl bg-card p-6 sm:p-7", props.className)}>
       <header className="mb-5 flex items-start justify-between gap-3">
         <div className="space-y-1">
           <h2 className="text-base font-bold">{props.judul}</h2>

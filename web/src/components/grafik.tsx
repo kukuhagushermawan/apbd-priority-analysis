@@ -40,6 +40,8 @@ export function daftarkanPeta(nama: string, geojson: object) {
 }
 
 export { ABU, EMAS, GRID, NAVY, ORANYE, TEKS, WARNA_KOMPONEN, WARNA_SERI, warnaKlaster } from "@/lib/warna";
+const WARNA_PITA = "#dfe6f1";
+
 export const SUMBU = {
   axisTick: { show: false },
   axisLabel: { color: TEKS },
@@ -50,11 +52,12 @@ export const SUMBU = {
 type Props = {
   opsi: OpsiGrafik;
   tinggi?: number;
+  rasio?: number; // lebar ÷ tinggi; bila diisi, tinggi mengikuti lebar (dipakai peta)
   label: string; // deskripsi untuk pembaca layar
   onKlik?: (p: { seriesId?: string; seriesIndex?: number; name: string; data: unknown; value: unknown; dataType?: string }) => void;
 };
 
-export function Grafik({ opsi, tinggi = 320, label, onKlik }: Props) {
+export function Grafik({ opsi, tinggi = 320, rasio, label, onKlik }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const chart = useRef<echarts.ECharts | null>(null);
   const klik = useRef(onKlik);
@@ -79,7 +82,7 @@ export function Grafik({ opsi, tinggi = 320, label, onKlik }: Props) {
     chart.current?.setOption({ textStyle: { fontFamily: "inherit" }, ...opsi }, true);
   }, [opsi]);
 
-  return <div ref={ref} role="img" aria-label={label} style={{ height: tinggi }} className="w-full" />;
+  return <div ref={ref} role="img" aria-label={label} style={rasio ? { aspectRatio: rasio } : { height: tinggi }} className="w-full" />;
 }
 
 /**
@@ -107,22 +110,35 @@ export function GrafikPita(props: {
     const pita =
       bawah && atas
         ? [
-            { name: props.namaPita, type: "line", stack: "pita", data: bawah, lineStyle: { opacity: 0 }, symbol: "none", tooltip: { show: false } },
+            { name: props.namaPita, type: "line", stack: "pita", data: bawah, lineStyle: { opacity: 0 }, itemStyle: { color: WARNA_PITA }, symbol: "none", tooltip: { show: false } },
             {
               name: props.namaPita,
               type: "line",
               stack: "pita",
               data: atas.map((a, i) => (a === null || bawah[i] === null ? null : a - (bawah[i] as number))),
               lineStyle: { opacity: 0 },
+              itemStyle: { color: WARNA_PITA },
               symbol: "none",
-              areaStyle: { color: NAVY, opacity: 0.1 },
+              areaStyle: { color: WARNA_PITA, opacity: 1 },
               tooltip: { show: false },
             },
           ]
         : [];
     return {
-      grid: { left: 8, right: 16, top: 40, bottom: 8 },
-      legend: { top: 0, left: 0, textStyle: { color: TEKS }, data: [props.namaGaris, props.namaLanjutan, props.namaPita].filter(Boolean) },
+      // legenda di bawah; ruang atas dipakai label garis peristiwa
+      grid: { left: 12, right: 24, top: anotasi?.length ? 48 : 20, bottom: props.namaPita || props.namaLanjutan ? 56 : 28 },
+      legend: {
+        show: Boolean(props.namaPita || props.namaLanjutan), // satu seri saja tidak perlu legenda
+        bottom: 0,
+        left: "center",
+        itemGap: 20,
+        textStyle: { color: TEKS },
+        data: [
+          { name: props.namaGaris },
+          ...(props.namaLanjutan ? [{ name: props.namaLanjutan }] : []),
+          ...(props.namaPita ? [{ name: props.namaPita, icon: "roundRect" }] : []),
+        ],
+      },
       tooltip: {
         trigger: "axis",
         formatter: (ps: { axisValue: string; dataIndex: number }[]) => {
@@ -134,13 +150,14 @@ export function GrafikPita(props: {
           return baris.join("<br/>");
         },
       },
-      xAxis: { type: "category", data: sumbuX, boundaryGap: false, ...SUMBU, splitLine: { show: false } },
+      xAxis: { type: "category", data: sumbuX, boundaryGap: true, ...SUMBU, axisLabel: { color: TEKS, margin: 12 }, splitLine: { show: false } },
       yAxis: {
         type: "value",
         scale: true,
-        ...(acuan ? { min: (v: { min: number }) => Math.floor(Math.min(v.min, acuan.nilai) - 1) } : {}),
+        // batas bawah genap agar tidak muncul label sumbu ganjil yang berdempetan
+        ...(acuan ? { min: (v: { min: number }) => Math.floor((Math.min(v.min, acuan.nilai) - 1) / 2) * 2 } : {}),
         ...SUMBU,
-        axisLabel: { color: TEKS, formatter: satuan === "%" ? "{value}%" : `{value}` },
+        axisLabel: { color: TEKS, formatter: satuan === "%" ? "{value}%" : `{value} ${satuan}` },
       },
       series: [
         ...pita,
@@ -154,11 +171,18 @@ export function GrafikPita(props: {
           markLine: {
             symbol: "none",
             silent: true,
-            label: { color: TEKS, fontSize: 11 },
+            label: { color: TEKS, fontSize: 11, fontWeight: 500 },
             lineStyle: { color: "#9aa6ba", type: "dashed" },
             data: [
-              ...(anotasi ?? []).map((a) => ({ xAxis: a.x, label: { formatter: a.teks, position: "insideEndTop" } })),
-              ...(acuan ? [{ yAxis: acuan.nilai, label: { formatter: acuan.label, position: "insideEndTop" }, lineStyle: { color: "#c98500", type: "solid", width: 1.5 } }] : []),
+              // label mendatar di atas garis; selang-seling tinggi agar tidak bertumpuk, rata kiri/kanan di tepi sumbu
+              ...(anotasi ?? []).map((a, i) => {
+                const posisi = sumbuX.indexOf(a.x);
+                const align = posisi === 0 ? "left" : posisi === sumbuX.length - 1 ? "right" : "center";
+                return { xAxis: a.x, label: { formatter: a.teks, position: "end", align, distance: i % 2 ? 22 : 6 } };
+              }),
+              ...(acuan
+                ? [{ yAxis: acuan.nilai, label: { formatter: acuan.label, position: "insideEndTop", color: "#8a5a00" }, lineStyle: { color: "#c98500", type: "solid", width: 1.5 } }]
+                : []),
             ],
           },
         },
@@ -169,8 +193,10 @@ export function GrafikPita(props: {
                 type: "line",
                 data: garisLanjutan,
                 lineStyle: { width: 2.5, type: "dashed", color: EMAS },
-                itemStyle: { color: "#ffffff", borderColor: EMAS, borderWidth: 2.5 },
-                symbolSize: 8,
+                itemStyle: { color: EMAS },
+                symbol: "circle",
+                symbolSize: 7,
+                z: 1, // titik 2026 milik garis historis tetap di atas
               },
             ]
           : []),

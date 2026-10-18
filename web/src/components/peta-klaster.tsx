@@ -45,7 +45,7 @@ export function PetaKlaster({ klaster, anggota, modeProvinsi, query }: { klaster
       tooltip: {
         trigger: "item",
         formatter: (p: { data?: { pemda: string; value: number } }) =>
-          p.data ? `${p.data.pemda}<br/>${namaPendek(klaster.find((k) => k.klaster === p.data!.value)?.nama ?? "")}` : "Tidak ada data / bukan pemda ber-APBD",
+          p.data ? `${p.data.pemda}<br/>${namaPendek(klaster.find((k) => k.klaster === p.data!.value)?.nama ?? "")}` : "Tidak ada data atau bukan daerah otonom",
       },
       series: [
         {
@@ -68,14 +68,14 @@ export function PetaKlaster({ klaster, anggota, modeProvinsi, query }: { klaster
   }, [kodePeta, anggota, klaster, modeProvinsi]);
 
   if (galat) return <p className="text-sm text-destructive">Berkas peta gagal dimuat.</p>;
-  if (!opsi) return <Skeleton className="h-[420px]" />;
+  if (!opsi) return <Skeleton className="aspect-[2.5] w-full" />;
 
   return (
     <div className="space-y-2">
       <Grafik
         opsi={opsi}
-        tinggi={420}
-        label="Peta choropleth klaster pemda 2026"
+        rasio={2.5}
+        label="Peta klaster pemerintah daerah tahun 2026"
         onKlik={(p) => {
           const d = p.data as { kode?: string } | undefined;
           if (d?.kode) router.push(`/daerah/${d.kode}${query}`);
@@ -90,15 +90,15 @@ export function PetaKlaster({ klaster, anggota, modeProvinsi, query }: { klaster
         ))}
         <span className="inline-flex items-center gap-1.5">
           <span className="size-3 rounded-sm" style={{ background: KOSONG }} aria-hidden />
-          Tidak ada data / di luar filter
+          Tidak ada data atau di luar filter
         </span>
       </div>
       <p className="text-xs text-muted-foreground">
-        Batas wilayah: geoBoundaries (Runfola dkk., 2020), data BPS/WFP/OCHA ROAP kondisi 2020, lisensi{" "}
+        Batas wilayah: geoBoundaries (Runfola dkk., 2020), bersumber dari data BPS/WFP/OCHA ROAP kondisi 2020, dengan lisensi{" "}
         <a href="https://creativecommons.org/licenses/by/3.0/igo/" className="underline" target="_blank" rel="noreferrer">
           CC BY 3.0 IGO
         </a>
-        . Gulir untuk memperbesar, klik wilayah untuk membuka profilnya.
+        . Gulir untuk memperbesar peta dan klik wilayah untuk membuka profilnya.
       </p>
     </div>
   );

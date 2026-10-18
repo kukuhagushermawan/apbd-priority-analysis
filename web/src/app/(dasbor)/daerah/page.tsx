@@ -18,7 +18,7 @@ export default async function CariDaerah() {
       <JudulHalaman
         eyebrow="Daerah"
         judul="Cari daerah Anda"
-        keterangan="Ketik nama provinsi, kabupaten, atau kota untuk membuka profil belanjanya: komposisi, posisi terhadap daerah setingkat, dan kelompoknya."
+        keterangan="Ketik nama provinsi, kabupaten, atau kota untuk membuka profil belanjanya, meliputi komposisi belanja, posisi terhadap daerah setingkat, dan kelompoknya."
       >
         <div className="col-span-full max-w-xl">
           <Suspense fallback={<Skeleton className="h-11 rounded-full bg-white/20" />}>
@@ -27,8 +27,8 @@ export default async function CariDaerah() {
         </div>
       </JudulHalaman>
       <section className="rounded-3xl bg-card p-6 sm:p-7">
-        <h2 className="text-base font-bold">Atau mulai dari provinsi</h2>
-        <p className="mt-1 text-[13px] text-muted-foreground">38 provinsi, termasuk empat provinsi baru hasil pemekaran Papua 2022.</p>
+        <h2 className="text-base font-bold">Telusuri berdasarkan provinsi</h2>
+        <p className="mt-1 text-[13px] text-muted-foreground">Sebanyak 38 provinsi, termasuk empat provinsi baru hasil pemekaran Papua tahun 2022.</p>
         <ul className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {provinsi.map((p) => (
             <li key={p.kode_pemda}>

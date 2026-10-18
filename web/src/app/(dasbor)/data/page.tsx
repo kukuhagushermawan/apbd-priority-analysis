@@ -9,34 +9,34 @@ import { DEFINISI } from "@/lib/definisi";
 import { bacaFilter, keQuery } from "@/lib/filter";
 import { bilangan } from "@/lib/format";
 
-export const metadata: Metadata = { title: "Data & metodologi" };
+export const metadata: Metadata = { title: "Data dan Metodologi" };
 
 const CATATAN = [
   {
-    judul: "Format 2022 berbeda",
-    isi: "Berkas 2022 hanya punya satu sheet, kode akunnya tiga digit, dan nama beberapa fungsi berbeda. Semua tahun disamakan dulu ke satu format. Satuannya rupiah penuh.",
+    judul: "Perbedaan format tahun 2022",
+    isi: "Berkas tahun 2022 hanya memiliki satu sheet, kode akunnya terdiri atas tiga digit, dan nama beberapa fungsinya berbeda. Seluruh tahun diseragamkan terlebih dahulu ke dalam satu format dengan satuan rupiah penuh.",
   },
   {
     judul: "Pemekaran Papua",
-    isi: "Sejak APBD 2023 ada empat provinsi baru, dan 26 kabupaten/kota pindah kode. Kode lamanya kami ubah ke kode baru supaya tiap daerah tetap satu baris dari tahun ke tahun.",
+    isi: "Sejak APBD 2023 terdapat empat provinsi baru dan 26 kabupaten/kota berganti kode. Kode lama diubah ke kode baru agar setiap daerah tetap tercatat dalam satu baris dari tahun ke tahun.",
   },
   {
     judul: "Sembilan fungsi",
-    isi: "Fungsi pertahanan dan agama tidak muncul di data daerah karena keduanya urusan pemerintah pusat.",
+    isi: "Fungsi pertahanan dan agama tidak terdapat dalam data daerah karena keduanya merupakan urusan pemerintah pusat.",
   },
   {
     judul: "Perubahan klasifikasi 2023",
-    isi: "Dari 2022 ke 2023, hampir 9 dari 10 daerah serentak mengurangi porsi pelayanan umum. Ini lebih mungkin akibat cara DJPK memetakan kegiatan ke fungsi. Angka 2023 diberi tanda, dan tren serta proyeksi juga dihitung tanpa 2022.",
+    isi: "Dari tahun 2022 ke 2023, hampir 9 dari 10 daerah secara serentak menurunkan porsi pelayanan umum. Hal ini kemungkinan besar disebabkan oleh perubahan cara DJPK memetakan kegiatan ke fungsi. Data tahun 2023 diberi tanda khusus, sedangkan tren dan proyeksi juga dihitung tanpa data tahun 2022.",
   },
   {
     judul: "Anggaran, bukan realisasi",
-    isi: "Semua angka adalah rencana belanja di APBD. Realisasi 2022–2026 belum tersedia di portal DJPK.",
+    isi: "Seluruh angka merupakan rencana belanja dalam APBD. Data realisasi tahun 2022–2026 belum tersedia di portal DJPK.",
   },
 ];
 
 const NAMA_PEMERIKSAAN: Record<string, string> = {
-  total_fungsi_vs_ringkas: "Total fungsi sama dengan Ringkasan APBD",
-  jumlah_pemda: "Jumlah daerah sesuai berkas",
+  total_fungsi_vs_ringkas: "Total fungsi sesuai dengan Ringkasan APBD",
+  jumlah_pemda: "Jumlah daerah sesuai dengan berkas",
   sembilan_fungsi_lengkap: "Sembilan fungsi lengkap",
   share_berjumlah_100: "Porsi berjumlah 100%",
 };
@@ -44,7 +44,7 @@ const NAMA_PEMERIKSAAN: Record<string, string> = {
 export default function DataMetodologi({ searchParams }: PageProps<"/data">) {
   return (
     <>
-      <JudulHalaman eyebrow="Data & metodologi" judul="Dari mana angkanya" keterangan="Sumber data, cara mengolah, hasil pemeriksaan, dan unduhan CSV." />
+      <JudulHalaman eyebrow="Data dan Metodologi" judul="Sumber dan pengolahan data" keterangan="Sumber data, tahapan pengolahan, hasil pemeriksaan, dan unduhan CSV." />
       <Suspense fallback={<Skeleton className="h-64 rounded-3xl bg-white/70" />}>
         <StatusDanUnduh searchParams={searchParams} />
       </Suspense>
@@ -60,7 +60,7 @@ export default function DataMetodologi({ searchParams }: PageProps<"/data">) {
       </section>
 
       <section className="rounded-3xl bg-card p-7">
-        <h2 className="mb-5 text-base font-bold">Istilah yang dipakai</h2>
+        <h2 className="mb-5 text-base font-bold">Daftar istilah</h2>
         <dl className="grid gap-x-10 gap-y-5 text-sm md:grid-cols-2">
           {Object.entries(DEFINISI).map(([id, d]) => (
             <div key={id} className="space-y-1">
@@ -86,7 +86,7 @@ async function StatusDanUnduh({ searchParams }: { searchParams: PageProps<"/data
       <KartuGrafik
         className="xl:col-span-2"
         judul="Pemeriksaan data"
-        keterangan={`Selisih terbesar dengan Ringkasan APBD hanya Rp${bilangan(Math.round(maksRp))}, dari pembulatan sen.`}
+        keterangan={`Selisih terbesar dengan Ringkasan APBD hanya Rp${bilangan(Math.round(maksRp))} yang berasal dari pembulatan sen.`}
         definisi="validasi"
       >
         <Table>
@@ -109,7 +109,7 @@ async function StatusDanUnduh({ searchParams }: { searchParams: PageProps<"/data
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 text-red-700">
-                      <X className="size-3.5" aria-hidden /> {v.status === "PERINGATAN" ? "Perlu dicek" : "Gagal"}
+                      <X className="size-3.5" aria-hidden /> {v.status === "PERINGATAN" ? "Perlu diperiksa" : "Gagal"}
                     </span>
                   )}
                 </TableCell>
@@ -118,15 +118,15 @@ async function StatusDanUnduh({ searchParams }: { searchParams: PageProps<"/data
           </TableBody>
         </Table>
       </KartuGrafik>
-      <KartuGrafik judul="Unduh" keterangan="CSV berisi anggaran, total belanja, porsi, dan perubahannya per daerah dan fungsi.">
+      <KartuGrafik judul="Unduh data" keterangan="Berkas CSV berisi anggaran, total belanja, porsi, dan perubahannya per daerah dan fungsi.">
         <div className="flex flex-col gap-2">
           <a href={`/api/unduh${q ? `?${q}` : ""}`} className={tombol}>
-            <Download className="size-4" aria-hidden /> Tahun {filter.tahun}, sesuai filter
+            <Download className="size-4" aria-hidden /> Tahun {filter.tahun} sesuai filter
           </a>
           <a href={`/api/unduh?semua=1${q ? `&${q}` : ""}`} className={tombol}>
-            <Download className="size-4" aria-hidden /> 2022–2026, sesuai filter
+            <Download className="size-4" aria-hidden /> Tahun 2022–2026 sesuai filter
           </a>
-          <p className="pt-1 text-xs text-muted-foreground">CSV satu daerah ada di halaman profilnya.</p>
+          <p className="pt-1 text-xs text-muted-foreground">CSV untuk satu daerah tersedia di halaman profil daerah tersebut.</p>
         </div>
       </KartuGrafik>
     </div>

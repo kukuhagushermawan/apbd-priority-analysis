@@ -17,8 +17,8 @@ export function GrafikKomposisi({ tahun, komposisi, tautan = true }: { tahun: nu
 
   const opsi = useMemo(
     () => ({
-      grid: { left: 8, right: 8, top: 56, bottom: 8 },
-      legend: { top: 0, left: 0, icon: "roundRect", itemWidth: 12, itemHeight: 12, textStyle: { color: TEKS } },
+      grid: { left: 8, right: 40, top: 16, bottom: 72 },
+      legend: { bottom: 0, left: "center", icon: "roundRect", itemWidth: 12, itemHeight: 12, itemGap: 16, textStyle: { color: TEKS } },
       tooltip: { trigger: "axis", axisPointer: { type: "shadow" }, valueFormatter: (v: number) => persen(v) },
       xAxis: { type: "category", data: tahun.map(String), ...SUMBU },
       yAxis: { type: "value", max: 100, ...SUMBU, axisLabel: { color: TEKS, formatter: "{value}%" }, splitLine: { lineStyle: { color: GRID } } },
@@ -27,15 +27,19 @@ export function GrafikKomposisi({ tahun, komposisi, tautan = true }: { tahun: nu
         name: g.nama,
         type: "bar",
         stack: "total",
-        barMaxWidth: 56,
-        data: g.nilai.map((v) => Number(v.toFixed(2))),
-        itemStyle: { color: WARNA_KOMPONEN[g.kode], borderColor: "#ffffff", borderWidth: 2, opacity: sorot && sorot !== g.kode ? 0.25 : 1 },
+        barMaxWidth: 52,
+        // segmen tipis (< 4%) labelnya ditaruh di samping batang agar angkanya tetap terbaca
+        data: g.nilai.map((v) => {
+          const value = Number(v.toFixed(2));
+          return value < 4 ? { value, label: { position: "right", color: TEKS, fontWeight: 600 } } : value;
+        }),
+        itemStyle: { color: WARNA_KOMPONEN[g.kode], borderColor: "#ffffff", borderWidth: 1, opacity: sorot && sorot !== g.kode ? 0.25 : 1 },
         label: {
           show: true,
           color: ["01", "07"].includes(g.kode) ? "#ffffff" : "#15171c",
           fontSize: 11,
           fontWeight: 600,
-          formatter: (p: { value: number }) => (p.value >= 5 ? `${p.value.toFixed(0)}%` : ""),
+          formatter: (p: { value: number }) => (p.value >= 0.5 ? `${Math.round(p.value)}%` : ""),
         },
         emphasis: { focus: "series" },
         cursor: tautan ? "pointer" : "default",
@@ -47,8 +51,8 @@ export function GrafikKomposisi({ tahun, komposisi, tautan = true }: { tahun: nu
   return (
     <Grafik
       opsi={opsi}
-      tinggi={360}
-      label="Grafik batang bertumpuk komposisi share anggaran per fungsi"
+      tinggi={400}
+      label="Grafik batang bertumpuk komposisi porsi anggaran per fungsi"
       onKlik={
         tautan
           ? (p) => {
@@ -77,7 +81,7 @@ export function HeatmapDelta({ delta, fungsiDipilih }: { delta: Delta; fungsiDip
       grid: { left: 8, right: 8, top: 8, bottom: 56 },
       tooltip: {
         formatter: (p: { value: number[] }) =>
-          `${baris[p.value[1]].nama}<br/>${tahun[p.value[0]]}: <b>${pp(p.value[2])}</b>${tahun[p.value[0]] === 2023 ? "<br/><i>patahan klasifikasi 2022→2023</i>" : ""}`,
+          `${baris[p.value[1]].nama}<br/>${tahun[p.value[0]]}: <b>${pp(p.value[2])}</b>${tahun[p.value[0]] === 2023 ? "<br/><i>Terpengaruh perubahan klasifikasi 2022→2023</i>" : ""}`,
       },
       xAxis: { type: "category", data: tahun.map((t) => (t === 2023 ? "2023*" : String(t))), ...SUMBU },
       yAxis: { type: "category", data: baris.map((b) => b.nama), inverse: true, ...SUMBU },
@@ -90,7 +94,7 @@ export function HeatmapDelta({ delta, fungsiDipilih }: { delta: Delta; fungsiDip
         bottom: 0,
         itemWidth: 12,
         itemHeight: 160,
-        text: ["Naik", "Turun"],
+        text: ["Meningkat", "Menurun"],
         itemGap: 8,
         textStyle: { color: TEKS },
         // divergen: oranye (turun) - abu netral - biru tua (naik)
@@ -104,7 +108,7 @@ export function HeatmapDelta({ delta, fungsiDipilih }: { delta: Delta; fungsiDip
             label: { color: Math.abs(v) / batas > 0.5 ? "#ffffff" : "#15171c" },
             itemStyle: dipilih(x, y) ? { borderColor: "#f5b800", borderWidth: 3 } : undefined,
           })),
-          label: { show: true, fontSize: 11, fontWeight: 600, color: "#15171c", formatter: (p: { value: number[] }) => p.value[2].toFixed(1).replace(".", ",") },
+          label: { show: true, fontSize: 11, fontWeight: 600, color: "#15171c", formatter: (p: { value: number[] }) => (Math.abs(p.value[2]) < 0.05 ? "0,0" : p.value[2].toFixed(1).replace(".", ",")) },
           itemStyle: { borderColor: "#ffffff", borderWidth: 3, borderRadius: 8 },
           cursor: "pointer",
         },
@@ -116,7 +120,7 @@ export function HeatmapDelta({ delta, fungsiDipilih }: { delta: Delta; fungsiDip
     <Grafik
       opsi={opsi}
       tinggi={380}
-      label="Heatmap perubahan share anggaran per fungsi dan tahun"
+      label="Peta panas perubahan porsi anggaran per fungsi dan tahun"
       onKlik={(p) => {
         const [x, y] = p.value as number[];
         router.push(`/pergeseran${keQuery({ ...filter, tahun: tahun[x], fungsi: baris[y].kode })}`, { scroll: false });

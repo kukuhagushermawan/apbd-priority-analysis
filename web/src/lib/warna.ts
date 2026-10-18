@@ -10,7 +10,7 @@ export const WARNA_KOMPONEN: Record<string, string> = {
   "07": "#3e6aa8", // Kesehatan
   "04": "#8fa8cf", // Ekonomi
   LN: "#c9d6ea", // Lainnya
-  "06": "#e1e8f2", // Perumahan & fasum
+  "06": "#6fb3ad", // Perumahan dan fasilitas umum (hijau toska agar segmen kecil tetap terlihat)
 };
 
 // Untuk 2-4 seri (Bandingkan): gelap, emas, oranye, biru muda

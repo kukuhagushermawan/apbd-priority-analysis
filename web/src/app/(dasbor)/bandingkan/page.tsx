@@ -17,7 +17,7 @@ export const metadata: Metadata = { title: "Bandingkan" };
 export default function Perbandingan({ searchParams }: PageProps<"/bandingkan">) {
   return (
     <>
-      <JudulHalaman eyebrow="Bandingkan" judul="Daerah berdampingan" keterangan="Pilih dua sampai empat daerah untuk melihat beda porsi atau nilai belanjanya." />
+      <JudulHalaman eyebrow="Bandingkan" judul="Perbandingan antardaerah" keterangan="Pilih dua hingga empat daerah untuk membandingkan porsi atau nilai belanjanya." />
       <Suspense fallback={<KerangkaMemuat />}>
         <Isi searchParams={searchParams} />
       </Suspense>
@@ -54,18 +54,18 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/bandingkan">["s
         </div>
         {pemda.length < 4 && (
           <Suspense>
-            <CariPemda daftar={daftar} tujuan="bandingkan" placeholder={pemda.length ? "Tambah daerah" : "Cari daerah pertama"} />
+            <CariPemda daftar={daftar} tujuan="bandingkan" placeholder={pemda.length ? "Tambahkan daerah" : "Cari daerah pertama"} />
           </Suspense>
         )}
       </div>
 
       {pemda.length < 2 ? (
-        <Kosong pesan="Pilih setidaknya dua daerah. Bisa juga lewat tombol Bandingkan di halaman profil daerah." />
+        <Kosong pesan="Pilih sekurang-kurangnya dua daerah. Daerah juga dapat ditambahkan melalui tombol Bandingkan pada halaman profil daerah." />
       ) : (
         <>
           <KartuGrafik
             judul={`${ukuran === "share" ? "Porsi" : "Nilai"} belanja per fungsi, ${filter.tahun}`}
-            keterangan={ukuran === "share" ? "Persen dari total belanja masing-masing daerah." : "Dalam triliun rupiah (APBD Anggaran)."}
+            keterangan={ukuran === "share" ? "Persentase terhadap total belanja masing-masing daerah." : "Dalam triliun rupiah (APBD status anggaran)."}
             definisi="share"
           >
             <div className="mb-3">
@@ -81,8 +81,8 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/bandingkan">["s
           </KartuGrafik>
 
           <KartuGrafik
-            judul="Selisihnya"
-            keterangan={`Angka kecil di samping: selisih dengan ${pemda[0].nama}.`}
+            judul="Selisih porsi antardaerah"
+            keterangan={`Angka kecil di samping menunjukkan selisih dengan ${pemda[0].nama}.`}
             definisi="delta"
           >
             <Table>

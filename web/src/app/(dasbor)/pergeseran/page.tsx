@@ -15,8 +15,8 @@ export default function Pergeseran({ searchParams }: PageProps<"/pergeseran">) {
     <>
       <JudulHalaman
         eyebrow="Pergeseran"
-        judul="Kapan prioritas berubah tajam"
-        keterangan="Perubahan porsi tiap tahun, daerah penyebabnya, dan daerah yang berubah jauh lebih banyak dari daerah lain."
+        judul="Waktu terjadinya pergeseran prioritas belanja"
+        keterangan="Perubahan porsi setiap tahun, daerah penyebabnya, serta daerah yang perubahannya jauh lebih besar daripada daerah lain."
       />
       <Suspense fallback={<KerangkaMemuat />}>
         <Isi searchParams={searchParams} />
@@ -28,7 +28,7 @@ export default function Pergeseran({ searchParams }: PageProps<"/pergeseran">) {
 async function Isi({ searchParams }: { searchParams: PageProps<"/pergeseran">["searchParams"] }) {
   const filter = bacaFilter(await searchParams);
   const ringkasan = await getRingkasan(filter);
-  if (!ringkasan.jumlahPemda) return <Kosong pesan="Tidak ada daerah yang cocok dengan filter ini." />;
+  if (!ringkasan.jumlahPemda) return <Kosong pesan="Tidak ada daerah yang sesuai dengan filter ini." />;
 
   // tanpa pilihan fungsi: tampilkan fungsi yang porsinya paling banyak berubah di tahun itu
   const iTahun = (ringkasan.delta.tahun as number[]).indexOf(filter.tahun);
@@ -43,43 +43,43 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/pergeseran">["s
     <>
       {filter.tahun === 2023 && (
         <Peringatan>
-          Sebagian perubahan 2022→2023 terjadi karena DJPK mulai memetakan kegiatan ke fungsi dengan cara baru, bukan karena keputusan daerah.
+          Sebagian perubahan 2022→2023 disebabkan oleh perubahan cara DJPK memetakan kegiatan ke fungsi, bukan oleh keputusan pemerintah daerah.
         </Peringatan>
       )}
       <div className="grid gap-5 xl:grid-cols-2">
-        <KartuGrafik judul="Perubahan porsi per fungsi" keterangan="Kotak bergaris tebal sedang dipilih. Klik kotak lain untuk mengganti." definisi="delta">
+        <KartuGrafik judul="Perubahan porsi per fungsi" keterangan="Kotak bergaris tebal menandakan fungsi yang dipilih. Klik kotak lain untuk menggantinya." definisi="delta">
           <HeatmapDelta delta={ringkasan.delta} fungsiDipilih={fungsi} />
         </KartuGrafik>
-        <KartuGrafik judul="Besarnya pergeseran tiap tahun" keterangan="Garis: daerah di tengah-tengah. Area: separuh daerah." definisi="ips">
+        <KartuGrafik judul="Besaran pergeseran setiap tahun" keterangan="Garis menunjukkan nilai tengah (median). Area menunjukkan rentang separuh daerah." definisi="ips">
           <GrafikPita
             sumbuX={tahunIps}
             garis={ips("median")}
             namaGaris="Median"
             bawah={ips("p25")}
             atas={ips("p75")}
-            namaPita="Separuh daerah"
+            namaPita="Rentang separuh daerah"
             satuan="pp"
-            anotasi={[{ x: "2023", teks: "Klasifikasi berubah" }]}
+            anotasi={[{ x: "2023", teks: "Perubahan klasifikasi" }]}
             label="Median pergeseran komposisi belanja per tahun"
           />
         </KartuGrafik>
       </div>
 
       {filter.tahun === 2022 ? (
-        <Kosong pesan="Pergeseran baru bisa dihitung mulai 2023. Pilih tahun lain di atas." />
+        <Kosong pesan="Pergeseran baru dapat dihitung mulai tahun 2023. Silakan pilih tahun lain pada filter di atas." />
       ) : (
         <div className="grid gap-5 xl:grid-cols-2">
-          <KartuGrafik judul={`${data.namaFungsi}, ${filter.tahun}: siapa yang berubah?`} keterangan="Daerah dengan kenaikan dan penurunan porsi terbesar." definisi="delta">
-            <TabelPenyumbang judul="Naik" baris={data.penyumbangNaik} query={q} />
-            <TabelPenyumbang judul="Turun" baris={data.penyumbangTurun} query={q} />
+          <KartuGrafik judul={`${data.namaFungsi}, ${filter.tahun}: daerah penyebab perubahan`} keterangan="Daerah dengan kenaikan dan penurunan porsi terbesar." definisi="delta">
+            <TabelPenyumbang judul="Meningkat" baris={data.penyumbangNaik} query={q} />
+            <TabelPenyumbang judul="Menurun" baris={data.penyumbangTurun} query={q} />
           </KartuGrafik>
           <KartuGrafik
-            judul={`Daerah yang melonjak, ${filter.tahun}`}
-            keterangan={`${data.lonjakan.length} daerah berubah jauh lebih banyak dari daerah setingkat.`}
+            judul={`Daerah yang mengalami lonjakan, ${filter.tahun}`}
+            keterangan={`${data.lonjakan.length} daerah mengalami perubahan yang jauh lebih besar daripada daerah setingkat.`}
             definisi="ips"
           >
             {data.lonjakan.length === 0 ? (
-              <Kosong pesan="Tidak ada lonjakan untuk filter ini." />
+              <Kosong pesan="Tidak terdapat lonjakan untuk filter ini." />
             ) : (
               <div className="max-h-[28rem] overflow-y-auto">
                 <Table>

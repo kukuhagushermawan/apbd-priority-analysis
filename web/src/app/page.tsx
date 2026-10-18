@@ -1,6 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { Kawung, Logo } from "@/components/kawung";
+import { Logo } from "@/components/logo";
 import { getBeranda } from "@/lib/data";
 import { bilangan, persen, pp } from "@/lib/format";
 import titik from "@/lib/peta-titik.json";
@@ -9,19 +9,19 @@ import { WARNA_KOMPONEN } from "@/lib/warna";
 const NAMA_PENDEK: Record<string, string> = {
   "01": "Pelayanan umum",
   "04": "Ekonomi",
-  "06": "Perumahan & fasum",
+  "06": "Perumahan dan fasilitas umum",
   "07": "Kesehatan",
   "10": "Pendidikan",
-  LN: "Lainnya",
+  LN: "Fungsi lainnya",
 };
 
 const JELAJAH = [
-  { href: "/ringkasan", tanya: "Bagaimana komposisi belanja berubah?", isi: "Ringkasan seluruh daerah, 2022–2026.", ikon: IkonRingkasan },
-  { href: "/tren", tanya: "Urusan apa yang terus naik?", isi: "Tren tiap fungsi.", ikon: IkonTren },
-  { href: "/pergeseran", tanya: "Kapan prioritas bergeser tajam?", isi: "Deteksi pergeseran dan daerah penyebabnya.", ikon: IkonPergeseran },
-  { href: "/daerah", tanya: "Bagaimana daerah saya?", isi: "Profil dan perbandingan antardaerah.", ikon: IkonDaerah },
-  { href: "/klaster", tanya: "Daerah mana yang mirip?", isi: "Klaster dan peta.", ikon: IkonKlaster },
-  { href: "/proyeksi", tanya: "Ke mana arahnya 2027?", isi: "Proyeksi 2027–2028.", ikon: IkonProyeksi },
+  { href: "/ringkasan", tanya: "Bagaimana komposisi belanja berubah?", isi: "Ringkasan seluruh pemerintah daerah tahun 2022–2026.", ikon: IkonRingkasan },
+  { href: "/tren", tanya: "Fungsi apa yang porsinya terus meningkat?", isi: "Tren porsi belanja setiap fungsi.", ikon: IkonTren },
+  { href: "/pergeseran", tanya: "Kapan prioritas belanja bergeser tajam?", isi: "Deteksi pergeseran beserta daerah penyebabnya.", ikon: IkonPergeseran },
+  { href: "/daerah", tanya: "Bagaimana profil daerah saya?", isi: "Profil dan perbandingan antardaerah.", ikon: IkonDaerah },
+  { href: "/klaster", tanya: "Daerah mana yang polanya serupa?", isi: "Pengelompokan daerah beserta petanya.", ikon: IkonKlaster },
+  { href: "/proyeksi", tanya: "Bagaimana arah belanja tahun 2027?", isi: "Proyeksi porsi belanja tahun 2027–2028.", ikon: IkonProyeksi },
 ];
 
 const judulSeksi = "font-display text-[clamp(26px,2.6vw,36px)] leading-tight font-semibold tracking-tight";
@@ -30,16 +30,15 @@ const labelSeksi = "text-xs font-semibold tracking-[0.08em] text-muted-foregroun
 export default async function Beranda() {
   const { ringkasan, klaster, persenPatahan, pulau } = await getBeranda();
   const akhir = ringkasan.tahun.length - 1;
-  const triliun = `Rp${bilangan(Math.round(ringkasan.totalBelanja / 1e12))} T`;
+  const triliun = `Rp${bilangan(Math.round(ringkasan.totalBelanja / 1e12))} triliun`;
   const komposisi = [...ringkasan.komposisi].sort((a, b) => b.nilai[akhir] - a.nilai[akhir]);
   const naik = ringkasan.kenaikanTerbesar;
 
   return (
     <div className="bg-background">
-      {/* Hero: pas satu layar, peta mengisi sisa tinggi */}
+      {/* Hero: pas satu layar (judul, peta, angka kunci); peta mengisi sisa tinggi */}
       <section className="relative flex flex-col overflow-hidden bg-primary text-white lg:h-[100svh] lg:max-h-[960px] lg:min-h-[640px]">
-        <Kawung id="kawung-hero" className="pointer-events-none absolute -top-24 -right-24 size-[380px] rounded-full opacity-[0.1]" />
-        <nav className="relative border-b border-white/10" aria-label="Utama">
+        <nav className="relative" aria-label="Utama">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4 sm:px-8">
             <Link href="/" className="flex items-center gap-2.5 text-sm font-bold">
               <Logo terang /> Peta Belanja Daerah
@@ -49,34 +48,26 @@ export default async function Beranda() {
               <a href="#jelajahi" className="hidden rounded-full px-3 py-2 text-[#c3cee0] hover:text-white sm:inline">Jelajahi</a>
               <Link href="/data" className="hidden rounded-full px-3 py-2 text-[#c3cee0] hover:text-white sm:inline">Metodologi</Link>
               <Link href="/ringkasan" className="ml-2 rounded-full bg-white px-4 py-2 font-semibold text-primary hover:bg-[#eef2f8]">
-                <span className="sm:hidden">Dashboard</span>
-                <span className="hidden sm:inline">Buka dashboard</span>
+                <span className="sm:hidden">Dasbor</span>
+                <span className="hidden sm:inline">Buka dasbor</span>
               </Link>
             </div>
           </div>
         </nav>
 
         <div className="relative mx-auto flex w-full max-w-6xl flex-1 flex-col px-6 sm:px-8 lg:min-h-0">
-          <div className="grid items-end gap-x-14 gap-y-6 pt-10 md:grid-cols-[1.15fr_1fr] lg:pt-12">
+          <div className="grid items-end gap-x-14 gap-y-6 pt-6 md:grid-cols-[1.15fr_1fr] lg:pt-8">
             <div>
-              <Link
-                href="/ringkasan"
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 py-1 pr-3 pl-1 text-xs text-[#c3cee0] hover:bg-white/10"
-              >
-                <span className="rounded-full bg-accent px-2 py-0.5 font-semibold text-accent-foreground">Baru</span>
-                Data APBD {ringkasan.filter.tahun} sudah masuk
-                <ArrowRight className="size-3" aria-hidden />
-              </Link>
-              <h1 className="mt-5 font-display text-[clamp(34px,4.2vw,58px)] leading-[1.04] font-semibold tracking-[-0.025em]">
-                Ke mana uang daerah dibelanjakan?
+              <h1 className="font-display text-[clamp(32px,3.6vw,52px)] leading-[1.05] font-semibold tracking-[-0.025em]">
+                Ke mana anggaran daerah dibelanjakan?
               </h1>
             </div>
             <div>
-              <p className="max-w-md text-[15px] leading-relaxed text-[#c3cee0] lg:text-base">
-                Kami membaca APBD {ringkasan.jumlahPemda} pemerintah daerah dari 2022 sampai 2026 untuk melihat urusan mana yang makin diutamakan
-                dan mana yang mengecil.
+              <p className="max-w-md text-[15px] leading-relaxed text-[#c3cee0]">
+                Platform ini menganalisis APBD {ringkasan.jumlahPemda} pemerintah daerah tahun 2022–2026 untuk mengetahui fungsi belanja yang
+                semakin diprioritaskan dan fungsi yang porsinya menurun.
               </p>
-              <div className="mt-6 flex flex-wrap items-center gap-3">
+              <div className="mt-5 flex flex-wrap items-center gap-3">
                 <Link
                   href="/ringkasan"
                   className="inline-flex h-11 items-center gap-2 rounded-full bg-accent px-5 text-sm font-semibold text-accent-foreground hover:brightness-105"
@@ -84,71 +75,83 @@ export default async function Beranda() {
                   Mulai menjelajah <ArrowRight className="size-4" aria-hidden />
                 </Link>
                 <Link href="/daerah" className="inline-flex h-11 items-center rounded-full border border-white/25 px-5 text-sm font-semibold hover:bg-white/10">
-                  Cari daerah Anda
+                  Cari daerah
                 </Link>
               </div>
             </div>
           </div>
 
-          <figure className="flex min-h-[220px] flex-1 flex-col pt-8 pb-24 lg:min-h-0 lg:pb-20">
+          <figure className="flex min-h-[220px] flex-1 flex-col pt-4 lg:min-h-0">
             <div className="relative min-h-0 flex-1">
               <svg
                 viewBox={`-12 -12 ${titik.lebar + 24} ${titik.tinggi + 24}`}
                 preserveAspectRatio="xMidYMid meet"
-                className="block h-full max-h-[460px] w-full"
+                className="block h-full max-h-[420px] w-full"
                 role="img"
-                aria-label="Peta titik Indonesia. Titik putih: kabupaten/kota yang belanjanya condong ke pendidikan. Titik kuning: condong ke ekonomi. Kelompok 2026."
+                aria-label="Peta titik Indonesia. Titik putih menunjukkan kabupaten/kota dengan porsi belanja pendidikan tinggi, titik kuning menunjukkan porsi belanja ekonomi tinggi, berdasarkan APBD 2026."
               >
                 <path d={titik.pendidikan} fill="none" stroke="#ffffff" strokeOpacity="0.88" strokeWidth="5.2" strokeLinecap="round" />
                 <path d={titik.ekonomi} fill="none" stroke="#f5b800" strokeWidth="5.2" strokeLinecap="round" />
-                <Anotasi x={150} y={6} ke={[392, 70]} judul="Kalimantan" isi={`${pulau.kalimantan.total - pulau.kalimantan.pendidikan} dari ${pulau.kalimantan.total} kab/kota condong ke ekonomi`} />
-                <Anotasi x={690} y={24} ke={[560, 118]} judul="Sulawesi" isi={`${pulau.sulawesi.pendidikan} dari ${pulau.sulawesi.total} condong ke pendidikan`} />
+                <Anotasi
+                  x={150}
+                  y={6}
+                  ke={[392, 70]}
+                  judul="Kalimantan"
+                  isi={`${pulau.kalimantan.total - pulau.kalimantan.pendidikan} dari ${pulau.kalimantan.total} kabupaten/kota berporsi ekonomi tinggi`}
+                />
+                <Anotasi
+                  x={628}
+                  y={24}
+                  ke={[560, 118]}
+                  judul="Sulawesi"
+                  isi={`${pulau.sulawesi.pendidikan} dari ${pulau.sulawesi.total} kabupaten/kota berporsi pendidikan tinggi`}
+                />
               </svg>
             </div>
-            <figcaption className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs text-[#c3cee0]">
+            <figcaption className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-xs text-[#c3cee0]">
               <span className="inline-flex items-center gap-2">
                 <span className="size-2 rounded-full bg-white" aria-hidden />
-                Condong ke pendidikan
+                Porsi belanja pendidikan tinggi
               </span>
               <span className="inline-flex items-center gap-2">
                 <span className="size-2 rounded-full bg-accent" aria-hidden />
-                Condong ke ekonomi
+                Porsi belanja ekonomi tinggi
               </span>
-              <span className="text-[#8ea3c6]">Satu titik ≈ 40 km. Kelompok belanja kabupaten/kota, APBD 2026.</span>
+              <span className="text-[#8ea3c6]">Setiap titik mewakili area sekitar 40 km. Pengelompokan kabupaten/kota berdasarkan APBD 2026.</span>
             </figcaption>
           </figure>
+
+          {/* Angka kunci: bagian dari hero agar langsung terlihat di layar pertama */}
+          <dl className="mt-5 mb-6 grid grid-cols-2 overflow-hidden rounded-2xl bg-card text-foreground lg:mb-8 lg:grid-cols-4">
+            {[
+              [bilangan(ringkasan.jumlahPemda), "pemerintah daerah"],
+              [triliun, `total belanja daerah tahun ${ringkasan.filter.tahun}`],
+              ["9", "fungsi belanja yang dianalisis"],
+              ["2022–2026", "periode tahun anggaran"],
+            ].map(([nilai, label], i) => (
+              <div key={label} className={`px-6 py-4 ${i % 2 === 0 ? "border-r" : ""} ${i < 2 ? "border-b lg:border-b-0" : ""} lg:border-r lg:last:border-r-0`}>
+                <dd className="font-display text-xl font-semibold tracking-tight text-primary sm:text-2xl">{nilai}</dd>
+                <dt className="mt-0.5 text-[13px] text-muted-foreground">{label}</dt>
+              </div>
+            ))}
+          </dl>
         </div>
       </section>
 
-      <div className="relative mx-auto -mt-14 max-w-6xl px-6 sm:px-8">
-        <dl className="grid grid-cols-2 overflow-hidden rounded-2xl bg-card shadow-[0_20px_40px_-24px_rgba(11,45,91,0.35)] lg:grid-cols-4">
-          {[
-            [bilangan(ringkasan.jumlahPemda), "pemerintah daerah"],
-            [triliun, `belanja daerah ${ringkasan.filter.tahun}`],
-            ["9", "fungsi belanja"],
-            ["2022–2026", "lima tahun anggaran"],
-          ].map(([nilai, label], i) => (
-            <div key={label} className={`px-6 py-5 ${i % 2 === 0 ? "border-r" : ""} ${i < 2 ? "border-b lg:border-b-0" : ""} lg:border-r lg:last:border-r-0`}>
-              <dd className="font-display text-2xl font-semibold tracking-tight text-primary sm:text-[28px]">{nilai}</dd>
-              <dt className="mt-0.5 text-[13px] text-muted-foreground">{label}</dt>
-            </div>
-          ))}
-        </dl>
-        <p className="mt-5 text-center text-xs text-muted-foreground">
-          Sumber: <span className="font-medium text-foreground">DJPK Kemenkeu</span> · Batas wilayah:{" "}
-          <span className="font-medium text-foreground">geoBoundaries (BPS)</span> · Diolah tim Capstone Computer Science UGM 2026
-        </p>
-      </div>
+      <p className="mx-auto max-w-6xl px-6 pt-6 text-center text-xs text-muted-foreground sm:px-8">
+        Sumber data: <span className="font-medium text-foreground">DJPK Kementerian Keuangan</span> · Batas wilayah:{" "}
+        <span className="font-medium text-foreground">geoBoundaries (BPS)</span>
+      </p>
 
-      <section className="mx-auto max-w-6xl px-6 pt-20 sm:px-8">
+      <section className="mx-auto max-w-6xl px-6 pt-14 sm:px-8">
         <div className="rounded-3xl bg-card p-6 sm:p-10">
           <div className="grid items-end gap-4 md:grid-cols-2">
             <div>
               <p className={labelSeksi}>APBD {ringkasan.filter.tahun}</p>
-              <h2 className={`mt-2 ${judulSeksi}`}>Ke mana {triliun.replace(" T", " triliun")} itu pergi?</h2>
+              <h2 className={`mt-2 ${judulSeksi}`}>Ke mana {triliun} itu dialokasikan?</h2>
             </div>
             <p className="max-w-md text-[15px] leading-relaxed text-muted-foreground md:justify-self-end">
-              Hampir enam dari sepuluh rupiah dipakai untuk dua urusan: {NAMA_PENDEK[komposisi[0].kode].toLowerCase()} dan{" "}
+              Hampir enam dari sepuluh rupiah dialokasikan untuk dua fungsi, yaitu {NAMA_PENDEK[komposisi[0].kode].toLowerCase()} dan{" "}
               {NAMA_PENDEK[komposisi[1].kode].toLowerCase()}.
             </p>
           </div>
@@ -184,11 +187,11 @@ export default async function Beranda() {
 
       <section id="temuan" className="mx-auto max-w-6xl scroll-mt-8 px-6 pt-20 sm:px-8">
         <p className={labelSeksi}>Temuan</p>
-        <h2 className={`mt-2 ${judulSeksi}`}>Tiga hal yang kami temukan</h2>
+        <h2 className={`mt-2 ${judulSeksi}`}>Temuan utama</h2>
         <div className="mt-8 grid gap-5 md:grid-cols-3">
-          <Temuan ilustrasi={<IlustrasiNaik />} angka={naik ? pp(naik.delta) : "–"} href={`/tren?fungsi=${naik?.kode ?? "10"}`} tautan="Lihat trennya">
-            Porsi {naik?.nama.toLowerCase()} naik paling banyak dari {ringkasan.filter.tahun - 1} ke {ringkasan.filter.tahun}, menjadi{" "}
-            {naik ? persen(ringkasan.shareTahunIni[naik.kode]) : ""}.
+          <Temuan ilustrasi={<IlustrasiNaik />} angka={naik ? pp(naik.delta) : "–"} href={`/tren?fungsi=${naik?.kode ?? "10"}`} tautan="Lihat tren">
+            Porsi belanja {naik?.nama.toLowerCase()} mengalami kenaikan terbesar dari tahun {ringkasan.filter.tahun - 1} ke tahun{" "}
+            {ringkasan.filter.tahun}, yaitu menjadi {naik ? persen(ringkasan.shareTahunIni[naik.kode]) : ""}.
           </Temuan>
           <Temuan
             ilustrasi={<IlustrasiKlaster awal={klaster.awal} akhir={klaster.akhir} total={klaster.total} />}
@@ -196,10 +199,11 @@ export default async function Beranda() {
             href="/klaster"
             tautan="Lihat di peta"
           >
-            Jumlah kabupaten/kota yang pola belanjanya condong ke pendidikan, dari 2023 ke 2026.
+            Jumlah kabupaten/kota dengan porsi belanja pendidikan tinggi meningkat dari tahun 2023 ke tahun 2026.
           </Temuan>
           <Temuan ilustrasi={<IlustrasiBerkas />} angka={`${Math.round(persenPatahan)}%`} href="/data" tautan="Baca metodologi">
-            Daerah yang serentak mengurangi porsi pelayanan umum di 2023. Penyebabnya perubahan klasifikasi DJPK, jadi angka tahun itu kami tandai.
+            Daerah secara serentak menurunkan porsi pelayanan umum pada tahun 2023 akibat perubahan klasifikasi DJPK sehingga data tahun tersebut diberi
+            tanda khusus.
           </Temuan>
         </div>
       </section>
@@ -210,7 +214,6 @@ export default async function Beranda() {
             <p className={labelSeksi}>Jelajahi</p>
             <h2 className={`mt-2 ${judulSeksi}`}>Mulai dari pertanyaan Anda</h2>
           </div>
-          <p className="max-w-sm text-sm text-muted-foreground">Semua tampilan bisa disaring per tahun, tingkat daerah, provinsi, dan fungsi.</p>
         </div>
         <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {JELAJAH.map(({ href, tanya, isi, ikon: Ikon }) => (
@@ -233,7 +236,6 @@ export default async function Beranda() {
       </section>
 
       <footer className="relative overflow-hidden bg-primary text-white">
-        <Kawung id="kawung-kaki" className="block h-12 w-full opacity-[0.2]" />
         <div className="mx-auto flex max-w-6xl flex-wrap items-end justify-between gap-6 px-6 pt-8 pb-10 sm:px-8">
           <div>
             <p className="flex items-center gap-2.5 font-display text-xl font-semibold">
@@ -241,7 +243,6 @@ export default async function Beranda() {
             </p>
             <p className="mt-2 text-sm text-[#c3cee0]">Computer Science UGM 2026 · Capstone Project</p>
           </div>
-          <p className="text-xs text-[#8ea3c6]">Data: DJPK Kemenkeu, APBD status anggaran · Batas wilayah: geoBoundaries</p>
         </div>
       </footer>
     </div>

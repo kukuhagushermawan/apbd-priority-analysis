@@ -23,47 +23,47 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/ringkasan">["se
   const data = await getRingkasan(filter);
   const q = keQuery(filter);
 
-  if (!data.jumlahPemda) return <Kosong pesan="Tidak ada daerah yang cocok dengan filter ini. Coba atur ulang filter di atas." />;
+  if (!data.jumlahPemda) return <Kosong pesan="Tidak ada daerah yang sesuai dengan filter ini. Silakan atur ulang filter di atas." />;
 
   return (
     <>
       <JudulHalaman
-        eyebrow={`Ringkasan · APBD Anggaran ${filter.tahun}`}
+        eyebrow={`Ringkasan · APBD ${filter.tahun}`}
         judul="Komposisi belanja seluruh daerah"
-        keterangan="Berapa persen anggaran daerah dipakai untuk tiap urusan, dan bagaimana berubah dari tahun ke tahun."
+        keterangan="Persentase anggaran daerah yang dialokasikan untuk setiap fungsi beserta perubahannya dari tahun ke tahun."
       >
-        <StatJudul label="Daerah" nilai={bilangan(data.jumlahPemda)} catatan={`Belanja ${rupiahTriliun(data.totalBelanja)}`} />
+        <StatJudul label="Jumlah daerah" nilai={bilangan(data.jumlahPemda)} catatan={`Total belanja ${rupiahTriliun(data.totalBelanja)}`} />
         <StatJudul label="Porsi terbesar" nilai={persen(data.fungsiTerbesar.share)} catatan={data.fungsiTerbesar.nama} definisi="share" />
         <StatJudul
-          label="Paling bertambah"
+          label="Kenaikan porsi terbesar"
           nilai={data.kenaikanTerbesar ? pp(data.kenaikanTerbesar.delta) : "–"}
-          catatan={data.kenaikanTerbesar ? `${data.kenaikanTerbesar.nama}, dari ${filter.tahun - 1}` : "Belum ada tahun pembanding"}
+          catatan={data.kenaikanTerbesar ? `${data.kenaikanTerbesar.nama}, dibandingkan dengan ${filter.tahun - 1}` : "Belum ada tahun pembanding"}
           definisi="delta"
           sorot
         />
         <StatJudul
-          label="Median pergeseran"
+          label="Median pergeseran (IPS)"
           nilai={data.medianIps !== null ? `${data.medianIps.toFixed(1).replace(".", ",")} pp` : "–"}
           catatan={
-            filter.tahun === 2023 ? "Terpengaruh perubahan klasifikasi" : data.medianIps !== null ? `${data.jumlahLonjakan} daerah melonjak` : "Mulai dihitung 2023"
+            filter.tahun === 2023 ? "Terpengaruh perubahan klasifikasi" : data.medianIps !== null ? `${data.jumlahLonjakan} daerah mengalami lonjakan` : "Dihitung mulai tahun 2023"
           }
           definisi="ips"
         />
       </JudulHalaman>
 
       <div className="grid gap-5 xl:grid-cols-2">
-        <KartuGrafik judul="Komposisi belanja" keterangan="Klik salah satu warna untuk melihat trennya." definisi="share">
+        <KartuGrafik judul="Komposisi belanja" keterangan="Klik salah satu warna untuk melihat tren fungsi tersebut." definisi="share">
           <GrafikKomposisi tahun={data.tahun} komposisi={data.komposisi} />
         </KartuGrafik>
-        <KartuGrafik judul="Perubahan porsi dari tahun sebelumnya" keterangan="Biru naik, oranye turun. Klik kotak untuk melihat daerahnya." definisi="delta">
+        <KartuGrafik judul="Perubahan porsi dari tahun sebelumnya" keterangan="Biru menunjukkan kenaikan, oranye menunjukkan penurunan. Klik kotak untuk melihat daerah penyebabnya." definisi="delta">
           <HeatmapDelta delta={data.delta} />
-          <p className="mt-2 text-xs text-muted-foreground">* 2023 terpengaruh perubahan klasifikasi DJPK.</p>
+          <p className="mt-2 text-xs text-muted-foreground">* Data tahun 2023 terpengaruh perubahan klasifikasi DJPK.</p>
         </KartuGrafik>
       </div>
 
       <KartuGrafik
         judul={`Pergeseran terbesar, ${filter.tahun}`}
-        keterangan="Lima daerah yang komposisi belanjanya paling banyak berubah."
+        keterangan="Lima daerah dengan perubahan komposisi belanja terbesar."
         definisi="ips"
         aksi={
           <a href={`/api/unduh${q}`} className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3.5 py-2 text-xs font-semibold text-primary hover:bg-[#dfe7f3]">
@@ -72,7 +72,7 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/ringkasan">["se
         }
       >
         {data.ipsTertinggi.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Pergeseran baru bisa dihitung mulai 2023. Pilih tahun lain di atas.</p>
+          <p className="text-sm text-muted-foreground">Pergeseran baru dapat dihitung mulai tahun 2023. Silakan pilih tahun lain pada filter di atas.</p>
         ) : (
           <Table>
             <TableHeader>
@@ -87,7 +87,7 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/ringkasan">["se
                 <TableRow key={r.kode_pemda}>
                   <TableCell className="py-3.5">
                     <TautanPemda kode={r.kode_pemda} nama={r.nama_pemda} query={q} />
-                    {r.lonjakan && <Lencana>melonjak</Lencana>}
+                    {r.lonjakan && <Lencana>lonjakan</Lencana>}
                   </TableCell>
                   <TableCell className="hidden text-muted-foreground sm:table-cell">{r.nama_provinsi.replace("Provinsi ", "")}</TableCell>
                   <TableCell className="text-right font-semibold">{r.ips_pp.toFixed(1).replace(".", ",")} pp</TableCell>

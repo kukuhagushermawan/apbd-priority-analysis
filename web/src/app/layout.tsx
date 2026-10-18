@@ -1,41 +1,18 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
-import { Suspense } from "react";
-import { FilterBar } from "@/components/filter-bar";
-import { NavigasiMobile, Sidebar } from "@/components/navigasi";
-import { getDaftarProvinsi } from "@/lib/data";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
-const geist = Geist({ variable: "--font-sans", subsets: ["latin"] });
+const font = Plus_Jakarta_Sans({ variable: "--font-sans", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Peta Prioritas Belanja Daerah",
-  description: "Pergeseran prioritas belanja APBD pemerintah daerah Indonesia 2022–2026 (status Anggaran, DJPK).",
+  title: { default: "Peta Belanja Daerah", template: "%s · Peta Belanja Daerah" },
+  description: "Ke mana anggaran 546 pemerintah daerah dibelanjakan, 2022–2026. Capstone Project Computer Science UGM 2026.",
 };
 
-export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const provinsi = await getDaftarProvinsi();
+export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="id" className={`${geist.variable} antialiased`}>
-      <body className="flex min-h-screen">
-        <Suspense>
-          <Sidebar />
-        </Suspense>
-        <div className="flex min-w-0 flex-1 flex-col">
-          <header className="z-30 border-b bg-background/95 px-4 py-3 backdrop-blur sm:px-6 lg:sticky lg:top-0">
-            <div className="mb-3 flex items-center gap-2 lg:hidden">
-              <Suspense>
-                <NavigasiMobile />
-              </Suspense>
-              <span className="font-semibold text-primary">Peta Prioritas Belanja Daerah</span>
-            </div>
-            <Suspense fallback={<div className="h-14" />}>
-              <FilterBar provinsi={provinsi} />
-            </Suspense>
-          </header>
-          <main className="flex-1 space-y-6 px-4 py-6 sm:px-6">{children}</main>
-        </div>
-      </body>
+    <html lang="id" className={`${font.variable} antialiased`}>
+      <body className="min-h-screen">{children}</body>
     </html>
   );
 }

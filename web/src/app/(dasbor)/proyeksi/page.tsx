@@ -1,9 +1,9 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { CariPemda } from "@/components/cari-pemda";
 import { GrafikPita } from "@/components/grafik";
 import { JudulHalaman, KartuGrafik, KerangkaMemuat, Kosong, Peringatan, TautanPemda } from "@/components/kartu";
-import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { bacaKode } from "@/lib/api";
 import { getDaftarPemda, getProyeksi } from "@/lib/data";
@@ -11,26 +11,25 @@ import { bacaFilter, keQuery, tautan } from "@/lib/filter";
 import { persen } from "@/lib/format";
 
 const NAMA_MODEL: Record<string, string> = {
-  naif: "Baseline naif (share tahun lalu)",
-  tren_linear: "Tren linear per pemda",
-  tren_diredam: "Tren diredam",
-  tren_kelompok: "Tren kelompok (pola pemda setingkat)",
+  naif: "Sama seperti tahun lalu",
+  tren_linear: "Garis tren tiap daerah",
+  tren_diredam: "Garis tren yang melambat",
+  tren_kelompok: "Tren daerah setingkat",
 };
 const mae = (v: number) => `${v.toFixed(2).replace(".", ",")} pp`;
+
+export const metadata: Metadata = { title: "Proyeksi" };
 
 export default function Proyeksi({ searchParams }: PageProps<"/proyeksi">) {
   return (
     <>
-      <div className="flex flex-wrap items-center gap-3">
-        <JudulHalaman
-          judul="Proyeksi 2027–2028"
-          keterangan="Ke mana arah share Anggaran bila pola 2022–2026 berlanjut? Model dipilih otomatis lewat backtest, hasilnya selalu berjumlah 100%."
-        />
-        <Badge className="bg-accent text-accent-foreground">Eksploratif</Badge>
-      </div>
+      <JudulHalaman
+        judul="Proyeksi 2027–2028"
+        keterangan="Perkiraan porsi belanja kalau pola 2022–2026 berlanjut. Sifatnya eksploratif."
+      />
       <Peringatan>
-        Baca dengan hati-hati: proyeksi dapat <b>patah</b> bila batas belanja pegawai 30% dan belanja infrastruktur 40% (UU 1/2022 HKPD) direlaksasi lewat
-        UU APBN 2027. Model hanya meneruskan pola masa lalu dan tidak mengetahui perubahan kebijakan.
+        Perkiraan ini bisa meleset jauh kalau batas belanja pegawai 30% dan infrastruktur 40% (UU HKPD) dilonggarkan lewat UU APBN 2027. Model
+        hanya meneruskan pola lama dan tidak tahu ada perubahan aturan.
       </Peringatan>
       <Suspense fallback={<KerangkaMemuat />}>
         <Isi searchParams={searchParams} />
@@ -50,7 +49,7 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/proyeksi">["sea
   const sumbuX = ["2022", "2023", "2024", "2025", "2026", "2027", "2028"];
   const hist = sumbuX.map((t) => data.historis.find((h) => String(h.tahun) === t)?.nilai ?? null);
   const proy = (k: "nilai" | "bawah" | "atas") => sumbuX.map((t) => data.proyeksi.find((p) => String(p.tahun) === t)?.[k] ?? (t === "2026" ? hist[4] : null));
-  const subjek = data.pemda ? data.pemda.nama_pemda : `median pemda${filter.tingkat ? ` ${filter.tingkat}` : ""}`;
+  const subjek = data.pemda ? data.pemda.nama_pemda : `median ${filter.tingkat ?? "daerah"}`;
 
   const tingkat = ["kabupaten", "kota", "provinsi"];
   const terpilih = tingkat.map((t) => ({
@@ -66,7 +65,7 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/proyeksi">["sea
     <>
       <div className="flex flex-col gap-2">
         <Suspense>
-          <CariPemda daftar={daftar} tujuan="proyeksi" placeholder="Pilih pemda tertentu… (kosong = median)" />
+          <CariPemda daftar={daftar} tujuan="proyeksi" placeholder="Pilih daerah (kosongkan untuk median)" />
         </Suspense>
         {data.pemda && (
           <p className="text-sm text-muted-foreground">
@@ -79,8 +78,8 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/proyeksi">["sea
       </div>
 
       <KartuGrafik
-        judul={`Share Anggaran ${data.namaFungsi}: ${subjek}`}
-        keterangan="Garis penuh = historis 2022–2026, garis putus-putus = proyeksi, pita = rentang ketidakpastian (80% galat backtest, melebar per tahun). Ganti fungsi lewat filter di atas."
+        judul={`${data.namaFungsi}, ${subjek}`}
+        keterangan="Garis putus-putus: perkiraan. Area: kemungkinan meleset. Fungsi bisa diganti lewat filter di atas."
         definisi="proyeksi"
       >
         <GrafikPita
@@ -91,14 +90,14 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/proyeksi">["sea
           namaLanjutan="Proyeksi"
           bawah={proy("bawah")}
           atas={proy("atas")}
-          namaPita="Rentang ketidakpastian"
-          anotasi={[{ x: "2027", teks: "Relaksasi batas belanja?" }]}
+          namaPita="Kemungkinan meleset"
+          anotasi={[{ x: "2027", teks: "Batas belanja dilonggarkan?" }]}
           label={`Proyeksi share anggaran ${data.namaFungsi} 2027-2028`}
           tinggi={380}
         />
         {p2027 && (
           <p className="mt-2 text-sm">
-            Proyeksi 2027: <b>{persen(p2027.nilai)}</b> (rentang {persen(p2027.bawah)}–{persen(p2027.atas)})
+            Perkiraan 2027: <span className="font-semibold">{persen(p2027.nilai)}</span>, kemungkinan antara {persen(p2027.bawah)} dan {persen(p2027.atas)}
             {modelSaatIni && <span className="text-muted-foreground"> · model: {NAMA_MODEL[modelSaatIni.pilihan.model]}</span>}
           </p>
         )}
@@ -106,8 +105,8 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/proyeksi">["sea
 
       <div className="grid gap-4 xl:grid-cols-2">
         <KartuGrafik
-          judul="Model terpilih vs baseline (backtest 2025–2026)"
-          keterangan="MAE = rata-rata selisih mutlak tebakan vs Anggaran sebenarnya, dalam poin persentase. Semakin kecil semakin akurat."
+          judul="Seberapa tepat modelnya?"
+          keterangan="Rata-rata meleset (pp) saat menebak 2025 dan 2026. Makin kecil makin baik."
           definisi="proyeksi"
         >
           <Table>
@@ -116,7 +115,7 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/proyeksi">["sea
                 <TableHead>Tingkat</TableHead>
                 <TableHead>Model terpilih</TableHead>
                 <TableHead className="text-right">MAE</TableHead>
-                <TableHead className="text-right">Baseline</TableHead>
+                <TableHead className="text-right">Tahun lalu</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -125,11 +124,11 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/proyeksi">["sea
                   <TableCell className="capitalize">{t.tingkat}</TableCell>
                   <TableCell>
                     {t.pilihan.model === "naif" ? (
-                      <span className="text-amber-800">Baseline (belum terkalahkan)</span>
+                      <span className="text-muted-foreground">Sama seperti tahun lalu</span>
                     ) : (
                       <>
                         {NAMA_MODEL[t.pilihan.model].split(" (")[0]}
-                        <span className="block text-xs text-muted-foreground">latih {t.pilihan.periode}</span>
+                        <span className="block text-xs text-muted-foreground">data {t.pilihan.periode.replace("-", "–")}</span>
                       </>
                     )}
                   </TableCell>
@@ -140,16 +139,16 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/proyeksi">["sea
             </TableBody>
           </Table>
           <p className="mt-3 text-xs text-muted-foreground">
-            Dengan hanya 5 titik tahunan, pola masing-masing pemda terlalu berisik; pola bersama pemda setingkat sedikit lebih baik dari baseline untuk
-            kabupaten. Untuk kota dan provinsi, proyeksi = share 2026 (baseline), dan itu dinyatakan apa adanya.
+            Lima tahun data terlalu sedikit untuk membaca pola tiap daerah. Pola bersama daerah setingkat sedikit lebih tepat untuk kabupaten.
+            Untuk kota dan provinsi belum ada model yang lebih baik dari “sama seperti tahun lalu”, jadi itu yang dipakai.
           </p>
         </KartuGrafik>
 
-        <KartuGrafik judul="Semua model yang diuji" keterangan="Rata-rata MAE (pp) backtest 2025 dan 2026 per tingkat pemda." definisi="proyeksi">
+        <KartuGrafik judul="Semua model yang dicoba" keterangan="Rata-rata meleset per tingkat daerah (pp)." definisi="proyeksi">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Model · periode latih</TableHead>
+                <TableHead>Model</TableHead>
                 {tingkat.map((t) => (
                   <TableHead key={t} className="text-right capitalize">
                     {t}
@@ -161,7 +160,7 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/proyeksi">["sea
               {urutModel.map((m) => (
                 <TableRow key={`${m.model}|${m.periode}`}>
                   <TableCell>
-                    {NAMA_MODEL[m.model].split(" (")[0]} <span className="text-xs text-muted-foreground">{m.periode === "-" ? "" : m.periode}</span>
+                    {NAMA_MODEL[m.model].split(" (")[0]} <span className="text-xs text-muted-foreground">{m.periode === "-" ? "" : `data ${m.periode.replace("-", "–")}`}</span>
                   </TableCell>
                   {tingkat.map((t) => {
                     const sel = data.metrik.find((x) => x.tingkat === t && x.model === m.model && x.periode === m.periode);

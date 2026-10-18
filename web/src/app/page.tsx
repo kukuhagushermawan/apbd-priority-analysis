@@ -1,138 +1,115 @@
-import { AlertTriangle, Download } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { Suspense } from "react";
-import { JudulHalaman, KartuGrafik, KartuKpi, KerangkaMemuat, Kosong } from "@/components/kartu";
-import { GrafikKomposisi, HeatmapDelta } from "@/components/ringkasan-grafik";
-import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { WARNA_KOMPONEN } from "@/lib/warna";
 import { getRingkasan } from "@/lib/data";
-import { bacaFilter, keQuery } from "@/lib/filter";
-import { bilangan, persen, pp, rupiahTriliun } from "@/lib/format";
+import { TAHUN_TERAKHIR } from "@/lib/filter";
+import { persen, pp, rupiahTriliun } from "@/lib/format";
 
-export default function RingkasanNasional({ searchParams }: PageProps<"/">) {
-  return (
-    <>
-      <JudulHalaman
-        judul="Ringkasan Nasional"
-        keterangan="Bagaimana komposisi belanja APBD (Anggaran) pemerintah daerah bergeser antarfungsi selama 2022–2026. Klik grafik untuk menelusuri lebih dalam."
-      />
-      <Suspense fallback={<KerangkaMemuat />}>
-        <Isi searchParams={searchParams} />
-      </Suspense>
-    </>
-  );
-}
+const JELAJAH = [
+  { href: "/ringkasan", judul: "Ringkasan", isi: "Komposisi belanja seluruh daerah dan perubahannya tiap tahun." },
+  { href: "/tren", judul: "Tren", isi: "Fungsi yang porsinya naik atau turun terus sejak 2022." },
+  { href: "/pergeseran", judul: "Pergeseran", isi: "Tahun dan daerah dengan perubahan prioritas paling tajam." },
+  { href: "/daerah", judul: "Daerah", isi: "Profil satu daerah dibanding daerah setingkat." },
+  { href: "/klaster", judul: "Klaster & peta", isi: "Kelompok daerah dengan pola belanja mirip, di atas peta." },
+  { href: "/proyeksi", judul: "Proyeksi", isi: "Perkiraan arah 2027–2028 beserta tingkat kesalahannya." },
+];
 
-async function Isi({ searchParams }: { searchParams: PageProps<"/">["searchParams"] }) {
-  const filter = bacaFilter(await searchParams);
-  const data = await getRingkasan(filter);
-  const q = keQuery(filter);
-
-  if (!data.jumlahPemda) return <Kosong pesan="Tidak ada pemda yang cocok dengan filter ini. Coba longgarkan filter tingkat atau provinsi." />;
+export default async function Beranda() {
+  const data = await getRingkasan({ tahun: TAHUN_TERAKHIR, tingkat: null, provinsi: null, fungsi: null });
+  const iAkhir = data.tahun.length - 1;
 
   return (
-    <>
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Indikator utama">
-        <KartuKpi
-          label={`Jumlah pemda ${filter.tahun}`}
-          nilai={bilangan(data.jumlahPemda)}
-          catatan={`Total belanja Anggaran ${rupiahTriliun(data.totalBelanja)}`}
-        />
-        <KartuKpi
-          label="Share Anggaran terbesar"
-          nilai={persen(data.fungsiTerbesar.share)}
-          catatan={data.fungsiTerbesar.nama}
-          definisi="share"
-        />
-        <KartuKpi
-          label={`Kenaikan terbesar ${filter.tahun}`}
-          nilai={data.kenaikanTerbesar ? pp(data.kenaikanTerbesar.delta) : "–"}
-          catatan={data.kenaikanTerbesar ? `${data.kenaikanTerbesar.nama} vs ${filter.tahun - 1}` : "Tidak ada tahun pembanding sebelum 2022"}
-          definisi="delta"
-        />
-        <KartuKpi
-          label={`Median IPS ${filter.tahun}`}
-          nilai={data.medianIps !== null ? `${data.medianIps.toFixed(1).replace(".", ",")} pp` : "–"}
-          catatan={
-            filter.tahun === 2023 ? (
-              <span className="inline-flex items-center gap-1 text-amber-700">
-                <AlertTriangle className="size-3.5" aria-hidden /> Dipengaruhi patahan klasifikasi
-              </span>
-            ) : data.medianIps !== null ? (
-              `${data.jumlahLonjakan} pemda dengan lonjakan (z > 3)`
-            ) : (
-              "IPS dimulai 2023"
-            )
-          }
-          definisi="ips"
-        />
+    <div className="mx-auto max-w-5xl px-6">
+      <header className="flex items-center justify-between py-6 text-sm">
+        <span className="flex items-center gap-2 font-semibold">
+          <span className="size-2 rounded-full bg-accent" aria-hidden />
+          Peta Belanja Daerah
+        </span>
+        <Link href="/ringkasan" className="text-muted-foreground hover:text-foreground">
+          Buka dashboard
+        </Link>
+      </header>
+
+      <section className="py-20 sm:py-28">
+        <p className="text-sm text-muted-foreground">Capstone Project · Computer Science UGM 2026</p>
+        <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-tight sm:text-6xl">Ke mana uang daerah dibelanjakan?</h1>
+        <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
+          Kami membaca APBD {data.jumlahPemda} pemerintah daerah dari 2022 sampai 2026, lalu melihat fungsi mana yang makin
+          diprioritaskan, mana yang mengecil, dan ke mana arahnya.
+        </p>
+        <div className="mt-10 flex flex-wrap items-center gap-6">
+          <Link
+            href="/ringkasan"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          >
+            Mulai menjelajah <ArrowRight className="size-4" aria-hidden />
+          </Link>
+          <Link href="/daerah" className="text-sm font-medium underline-offset-4 hover:underline">
+            Cari daerah Anda
+          </Link>
+        </div>
       </section>
 
-      <section className="grid gap-4 xl:grid-cols-2">
-        <KartuGrafik
-          judul="Komposisi share Anggaran per fungsi"
-          keterangan="Σ anggaran fungsi ÷ Σ total belanja pemda terpilih, 2022–2026. Klik segmen untuk melihat trennya."
-          definisi="share"
-        >
-          <GrafikKomposisi tahun={data.tahun} komposisi={data.komposisi} />
-        </KartuGrafik>
-        <KartuGrafik
-          judul="Perubahan share Anggaran (Δshare, pp)"
-          keterangan="Biru = naik, merah = turun dibanding tahun sebelumnya. ⚑ 2023 dipengaruhi patahan klasifikasi. Klik sel untuk melihat pemda penyumbang."
-          definisi="delta"
-        >
-          <HeatmapDelta delta={data.delta} />
-        </KartuGrafik>
-      </section>
-
-      <KartuGrafik
-        judul={`Lima pemda dengan IPS Anggaran tertinggi, ${filter.tahun}`}
-        keterangan="Indeks Pergeseran Struktur: porsi anggaran yang berpindah antarfungsi dibanding tahun sebelumnya."
-        definisi="ips"
-      >
-        {data.ipsTertinggi.length === 0 ? (
-          <Kosong pesan="IPS baru tersedia mulai 2023 (butuh tahun pembanding)." />
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Pemda</TableHead>
-                <TableHead className="hidden sm:table-cell">Provinsi</TableHead>
-                <TableHead className="text-right">IPS</TableHead>
-                <TableHead className="hidden text-right sm:table-cell">z robust</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.ipsTertinggi.map((r) => (
-                <TableRow key={r.kode_pemda}>
-                  <TableCell>
-                    <Link href={`/daerah/${r.kode_pemda}${q}`} className="font-medium text-primary hover:underline">
-                      {r.nama_pemda}
-                    </Link>
-                    {r.lonjakan && (
-                      <Badge variant="outline" className="ml-2 border-amber-500 text-amber-800">
-                        Lonjakan
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell className="hidden text-muted-foreground sm:table-cell">{r.nama_provinsi}</TableCell>
-                  <TableCell className="text-right font-medium">{r.ips_pp.toFixed(1).replace(".", ",")} pp</TableCell>
-                  <TableCell className="hidden text-right text-muted-foreground sm:table-cell">{r.z_robust.toFixed(1).replace(".", ",")}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+      <section className="border-t py-12">
+        <div className="flex items-baseline justify-between gap-4">
+          <h2 className="text-sm font-medium">Komposisi belanja daerah, Anggaran {TAHUN_TERAKHIR}</h2>
+          <span className="text-xs text-muted-foreground">Total {rupiahTriliun(data.totalBelanja)}</span>
+        </div>
+        <div className="mt-4 flex h-10 gap-[2px] overflow-hidden rounded-lg" role="img" aria-label={`Komposisi belanja daerah ${TAHUN_TERAKHIR}`}>
+          {data.komposisi.map((g) => (
+            <div key={g.kode} style={{ width: `${g.nilai[iAkhir]}%`, background: WARNA_KOMPONEN[g.kode] }} title={`${g.nama}: ${persen(g.nilai[iAkhir])}`} />
+          ))}
+        </div>
+        <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-3">
+          {data.komposisi.map((g) => (
+            <li key={g.kode} className="flex items-center gap-2">
+              <span className="size-2.5 rounded-sm" style={{ background: WARNA_KOMPONEN[g.kode] }} aria-hidden />
+              <span className="text-muted-foreground">{g.nama}</span>
+              <span className="ml-auto font-medium sm:ml-0">{persen(g.nilai[iAkhir])}</span>
+            </li>
+          ))}
+        </ul>
+        {data.kenaikanTerbesar && (
+          <p className="mt-6 text-sm text-muted-foreground">
+            Dibanding {TAHUN_TERAKHIR - 1}, porsi yang paling bertambah adalah{" "}
+            <span className="font-medium text-foreground">{data.kenaikanTerbesar.nama.toLowerCase()}</span> ({pp(data.kenaikanTerbesar.delta)}).
+          </p>
         )}
-      </KartuGrafik>
+      </section>
 
-      <div className="flex justify-end">
-        <a
-          href={`/api/unduh${q}`}
-          className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-        >
-          <Download className="size-4" aria-hidden /> Unduh CSV Anggaran ({filter.tahun}, sesuai filter)
-        </a>
-      </div>
-    </>
+      <section className="border-t py-12">
+        <h2 className="text-sm font-medium">Yang bisa dilihat</h2>
+        <ul className="mt-4 grid gap-x-10 sm:grid-cols-2">
+          {JELAJAH.map((j) => (
+            <li key={j.href} className="border-b last:border-b-0 sm:[&:nth-last-child(2)]:border-b-0">
+              <Link href={j.href} className="group flex items-start justify-between gap-4 py-4">
+                <span>
+                  <span className="block font-medium">{j.judul}</span>
+                  <span className="block text-sm text-muted-foreground">{j.isi}</span>
+                </span>
+                <ArrowRight className="mt-1 size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="border-t py-12 text-sm leading-relaxed text-muted-foreground">
+        <h2 className="mb-2 font-medium text-foreground">Tentang data</h2>
+        <p className="max-w-2xl">
+          Sumbernya berkas APBD status Anggaran dari DJPK Kemenkeu, jadi yang terlihat adalah rencana belanja, belum realisasi. Format lima
+          tahun kami samakan dulu, lalu totalnya dicocokkan dengan Ringkasan APBD.{" "}
+          <Link href="/data" className="text-foreground underline underline-offset-4">
+            Baca metodologinya
+          </Link>
+          .
+        </p>
+      </section>
+
+      <footer className="flex flex-col gap-1 border-t py-8 text-xs text-muted-foreground sm:flex-row sm:justify-between">
+        <span>Computer Science UGM 2026 · Capstone Project</span>
+        <span>Data: DJPK Kemenkeu · Batas wilayah: geoBoundaries</span>
+      </footer>
+    </div>
   );
 }

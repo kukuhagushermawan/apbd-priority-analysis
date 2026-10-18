@@ -77,19 +77,20 @@ Buka http://localhost:3000. Untuk deploy, `DATABASE_URL` diganti dengan connecti
 
 ## Halaman
 
-| Halaman | Pertanyaan yang dijawab |
+| Halaman | Isi |
 |---|---|
-| Ringkasan Nasional | Bagaimana komposisi belanja bergeser 2022–2026? |
-| Tren per Fungsi | Fungsi apa yang naik/turun konsisten? |
-| Deteksi Pergeseran | Kapan dan di mana pergeseran tajam terjadi, siapa penyumbangnya? |
-| Profil Daerah | Bagaimana satu pemda dibanding median dan klasternya? |
-| Perbandingan | Apa beda 2–4 pemda (share atau nominal)? |
-| Peta & Klaster | Pemda mana yang strukturnya mirip, dan siapa yang pindah kelompok? |
-| Proyeksi 2027–2028 | Ke mana arah share bila pola berlanjut, seberapa akurat modelnya? |
-| Kualitas Data & Unduh | Seberapa valid datanya, dan bagaimana mengunduhnya? |
+| `/` | Halaman pembuka: ringkasan singkat dan pintu masuk ke dashboard |
+| `/ringkasan` | Komposisi belanja seluruh daerah dan perubahannya tiap tahun |
+| `/tren` | Fungsi yang porsinya terus naik atau turun |
+| `/pergeseran` | Tahun dan daerah dengan perubahan prioritas paling tajam |
+| `/daerah`, `/daerah/[kode]` | Pencarian dan profil satu daerah |
+| `/bandingkan` | Dua sampai empat daerah berdampingan (porsi atau rupiah) |
+| `/klaster` | Kelompok daerah dengan pola belanja mirip, di atas peta |
+| `/proyeksi` | Perkiraan 2027–2028 dan tingkat kesalahan modelnya |
+| `/data` | Pemeriksaan data, catatan pengolahan, istilah, unduhan CSV |
 
 Filter tahun, tingkat, provinsi, dan fungsi tersimpan di URL, jadi tampilan bisa dibagikan. Semua nama
-pemda tertaut ke Profil Daerah.
+daerah tertaut ke profilnya, dan setiap grafik punya ikon ⓘ yang menjelaskan istilahnya di tempat.
 
 ## Status
 
@@ -98,5 +99,6 @@ pemda tertaut ke Profil Daerah.
 | 1–2 Data: audit format, standardisasi, share, validasi | selesai |
 | 3 Analitik dan prediksi dengan backtest | selesai |
 | 4 Database + API + halaman Ringkasan Nasional | selesai |
-| 5 Tujuh halaman lainnya + peta choropleth | selesai, menunggu tinjauan |
+| 5 Tujuh halaman lainnya + peta choropleth | selesai |
+| Revisi tampilan: landing page, desain minimalis, definisi di tempat | selesai, menunggu tinjauan |
 | 6 Pengujian, dokumentasi, deploy Vercel | – |

@@ -49,24 +49,24 @@
 }
 
 :root {
-  /* Tema UGM: biru tua (primary) + kuning emas (accent) */
-  --background: #f6f7fa;
-  --foreground: #0f1b2d;
+  /* Netral + aksen biru tua UGM; kuning dipakai sangat hemat */
+  --background: #ffffff;
+  --foreground: #18181b;
   --card: #ffffff;
-  --card-foreground: #0f1b2d;
+  --card-foreground: #18181b;
   --popover: #ffffff;
-  --popover-foreground: #0f1b2d;
+  --popover-foreground: #18181b;
   --primary: #0b2d5b;
   --primary-foreground: #ffffff;
-  --secondary: #e8edf5;
-  --secondary-foreground: #0b2d5b;
-  --muted: #eef1f6;
-  --muted-foreground: #556074;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
   --accent: #f5b800;
-  --accent-foreground: #0b2d5b;
+  --accent-foreground: #18181b;
   --destructive: #c62828;
-  --border: #dde3ec;
-  --input: #cfd7e3;
+  --border: #e9e9ec;
+  --input: #e4e4e7;
   --ring: #0b2d5b;
   --chart-1: #2a78d6;
   --chart-2: #eb6834;
@@ -74,14 +74,14 @@
   --chart-4: #eda100;
   --chart-5: #e87ba4;
   --radius: 0.625rem;
-  --sidebar: #0b2d5b;
-  --sidebar-foreground: #e6ecf5;
-  --sidebar-primary: #f5b800;
-  --sidebar-primary-foreground: #0b2d5b;
-  --sidebar-accent: #123c75;
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #1d4683;
-  --sidebar-ring: #f5b800;
+  --sidebar: #fafafa;
+  --sidebar-foreground: #52525b;
+  --sidebar-primary: #0b2d5b;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f0f0f2;
+  --sidebar-accent-foreground: #18181b;
+  --sidebar-border: #ececef;
+  --sidebar-ring: #0b2d5b;
 }
 
 .dark {
@@ -124,6 +124,10 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "tnum" 1;
+  }
+  ::selection {
+    background: #fde68a;
   }
   html {
     @apply font-sans;

@@ -73,7 +73,7 @@ export function HeatmapDelta({ delta, fungsiDipilih }: { delta: Delta; fungsiDip
         formatter: (p: { value: number[] }) =>
           `${baris[p.value[1]].nama}<br/>${tahun[p.value[0]]}: <b>${pp(p.value[2])}</b>${tahun[p.value[0]] === 2023 ? "<br/><i>patahan klasifikasi 2022→2023</i>" : ""}`,
       },
-      xAxis: { type: "category", data: tahun.map((t) => (t === 2023 ? "2023 ⚑" : String(t))), ...SUMBU },
+      xAxis: { type: "category", data: tahun.map((t) => (t === 2023 ? "2023*" : String(t))), ...SUMBU },
       yAxis: { type: "category", data: baris.map((b) => b.nama), inverse: true, ...SUMBU },
       visualMap: {
         min: -batas,

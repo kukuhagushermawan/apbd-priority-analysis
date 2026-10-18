@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { JudulHalaman, KartuGrafik, KerangkaMemuat, Kosong, Peringatan, PilihanTautan, TautanPemda } from "@/components/kartu";
 import { GrafikCentroid, GrafikSankey } from "@/components/klaster-grafik";
@@ -6,12 +7,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { getKlaster } from "@/lib/data";
 import { bacaFilter, keQuery, tautan } from "@/lib/filter";
 
+export const metadata: Metadata = { title: "Klaster & peta" };
+
 export default function HalamanKlaster({ searchParams }: PageProps<"/klaster">) {
   return (
     <>
       <JudulHalaman
-        judul="Peta & Klaster"
-        keterangan="Pemda dengan struktur belanja Anggaran yang mirip dikelompokkan (CLR + K-Means), terpisah untuk provinsi dan kabupaten/kota. Apakah pemda berpindah kelompok dari tahun ke tahun?"
+        judul="Klaster & peta"
+        keterangan="Daerah dengan pola belanja mirip dikelompokkan bersama. Provinsi dan kabupaten/kota dihitung terpisah."
       />
       <Suspense fallback={<KerangkaMemuat />}>
         <Isi searchParams={searchParams} />
@@ -29,41 +32,41 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/klaster">["sear
   const q = keQuery(filter);
   const link = (ekstra: Record<string, string>) => tautan("/klaster", filter, { kelompok, dari: String(dari), ...ekstra });
 
-  if (!data.anggota2026.length) return <Kosong pesan="Tidak ada pemda yang cocok dengan filter ini." />;
+  if (!data.anggota2026.length) return <Kosong pesan="Tidak ada daerah yang cocok dengan filter ini." />;
 
   return (
     <>
       <div className="flex flex-wrap gap-4">
         <PilihanTautan
-          label="Kelompok"
+          label="Tingkat"
           pilihan={[
             { teks: "Kabupaten/kota", href: link({ kelompok: "kabkota" }), aktif: kelompok === "kabkota" },
             { teks: "Provinsi", href: link({ kelompok: "provinsi" }), aktif: kelompok === "provinsi" },
           ]}
         />
         <PilihanTautan
-          label="Migrasi dari"
+          label="Bandingkan sejak"
           pilihan={[
             { teks: "2023", href: link({ dari: "2023" }), aktif: dari === 2023 },
-            { teks: "2022 ⚑", href: link({ dari: "2022" }), aktif: dari === 2022 },
+            { teks: "2022", href: link({ dari: "2022" }), aktif: dari === 2022 },
           ]}
         />
       </div>
       {dari === 2022 && (
-        <Peringatan>Klaster 2022 dipengaruhi patahan klasifikasi; perpindahan 2022→2026 sebagian berasal dari perubahan cara DJPK memetakan fungsi.</Peringatan>
+        <Peringatan>Data 2022 memakai klasifikasi fungsi yang lama, jadi sebagian perpindahan sejak 2022 bukan perubahan sungguhan.</Peringatan>
       )}
 
       <div className="grid gap-4 xl:grid-cols-2">
         <KartuGrafik
-          judul="Profil centroid klaster (share Anggaran)"
-          keterangan={`k = ${data.k} dipilih otomatis lewat skor silhouette (${data.silhouette.toFixed(2).replace(".", ",")}). Nama klaster = komponen yang paling menonjol.`}
+          judul="Ciri tiap kelompok"
+          keterangan="Rata-rata porsi belanja anggota kelompok. Abu-abu: rata-rata semua daerah."
           definisi="klaster"
         >
           <GrafikCentroid klaster={data.klaster} centroid={data.centroid} />
         </KartuGrafik>
         <KartuGrafik
-          judul={`Migrasi klaster ${dari} → 2026`}
-          keterangan="Lebar aliran = jumlah pemda. Aliran lurus = tetap di klaster yang sama."
+          judul={`Perpindahan kelompok, ${dari}–2026`}
+          keterangan="Makin lebar alirannya, makin banyak daerah."
           definisi="klaster"
         >
           <GrafikSankey klaster={data.klaster} tahunAwal={dari} migrasi={data.migrasi} />
@@ -71,7 +74,7 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/klaster">["sear
       </div>
 
       <div className="grid gap-4 xl:grid-cols-3">
-        <KartuGrafik judul="Jumlah pemda per klaster" keterangan="Anggota klaster tiap tahun (model dilatih 2023–2026)." definisi="klaster">
+        <KartuGrafik judul="Jumlah anggota" definisi="klaster">
           <Table>
             <TableHeader>
               <TableRow>
@@ -88,7 +91,7 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/klaster">["sear
                 <TableRow key={r.tahun}>
                   <TableCell>
                     {r.tahun}
-                    {r.tahun === 2022 ? " ⚑" : ""}
+                    {r.tahun === 2022 ? "" : ""}
                   </TableCell>
                   {r.jumlah.map((j, i) => (
                     <TableCell key={i} className="text-right tabular-nums">
@@ -108,8 +111,8 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/klaster">["sear
 
         <KartuGrafik
           className="xl:col-span-2"
-          judul={`Pemda yang berpindah klaster ${dari} → 2026 (${data.pindah.length})`}
-          keterangan="Klik nama untuk melihat profil dan posisinya terhadap centroid."
+          judul={`${data.pindah.length} daerah pindah kelompok`}
+          keterangan={`Sejak ${dari}.`}
           definisi="klaster"
         >
           <div className="max-h-80 overflow-y-auto">
@@ -133,8 +136,8 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/klaster">["sear
       </div>
 
       <KartuGrafik
-        judul={`Peta klaster ${kelompok === "provinsi" ? "provinsi" : "kabupaten/kota"} 2026`}
-        keterangan={kelompok === "provinsi" ? "Setiap kabupaten/kota diwarnai menurut klaster provinsinya." : "Warna wilayah = klaster struktur belanja Anggaran pemda."}
+        judul={`Peta kelompok ${kelompok === "provinsi" ? "provinsi" : "kabupaten/kota"}, 2026`}
+        keterangan={kelompok === "provinsi" ? "Kabupaten/kota diberi warna kelompok provinsinya." : undefined}
         definisi="klaster"
       >
         <PetaKlaster klaster={data.klaster} anggota={data.anggota2026} modeProvinsi={kelompok === "provinsi"} query={q} />

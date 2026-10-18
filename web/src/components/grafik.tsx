@@ -14,6 +14,7 @@ import {
 import * as echarts from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import { useEffect, useMemo, useRef } from "react";
+import { GRID, TEKS, WARNA_SERI } from "@/lib/warna";
 
 echarts.use([
   BarChart,
@@ -38,23 +39,11 @@ export function daftarkanPeta(nama: string, geojson: object) {
   if (!echarts.getMap(nama)) echarts.registerMap(nama, geojson as Parameters<typeof echarts.registerMap>[1]);
 }
 
-// Palet kategori tervalidasi (aman buta warna untuk seri bersebelahan); "Lainnya"/pembanding abu-abu netral.
-export const WARNA_SERI = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300"];
-export const WARNA_KOMPONEN: Record<string, string> = {
-  "01": WARNA_SERI[0],
-  "04": WARNA_SERI[1],
-  "06": WARNA_SERI[2],
-  "07": WARNA_SERI[3],
-  "10": WARNA_SERI[4],
-  LN: "#a3a7ae",
-};
-export const ABU = "#a3a7ae";
-export const TEKS = "#556074";
-export const GRID = "#e6eaf0";
+export { ABU, GRID, TEKS, WARNA_KOMPONEN, WARNA_SERI } from "@/lib/warna";
 export const SUMBU = {
   axisTick: { show: false },
   axisLabel: { color: TEKS },
-  axisLine: { lineStyle: { color: "#cfd7e3" } },
+  axisLine: { lineStyle: { color: "#e4e4e7" } },
   splitLine: { lineStyle: { color: GRID } },
 };
 

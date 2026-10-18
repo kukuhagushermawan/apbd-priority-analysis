@@ -396,5 +396,21 @@ export async function getBeranda() {
     FROM share_fungsi WHERE tahun = 2023 AND kode_fungsi = '01' AND delta_pp IS NOT NULL`;
   const [validasi] = await prisma.$queryRaw<{ lolos: number }[]>`
     SELECT COUNT(*) FILTER (WHERE status = 'LULUS')::int AS lolos FROM log_validasi WHERE pemeriksaan = 'total_fungsi_vs_ringkas'`;
-  return { ringkasan, klaster, klasterSemua, persenPatahan: patahan.persen, validasiLolos: validasi.lolos };
+  // kelompok kab/kota 2026 per pulau, untuk anotasi peta di beranda
+  const perProvinsi = await prisma.$queryRaw<{ nama_provinsi: string; pendidikan: number; total: number }[]>`
+    SELECT p.nama_provinsi, COUNT(*) FILTER (WHERE k.nama_klaster LIKE '%Pendidikan%')::int AS pendidikan, COUNT(*)::int AS total
+    FROM klaster k JOIN dim_pemda p ON p.kode_pemda = k.kode_pemda
+    WHERE k.tahun = 2026 AND k.kelompok = 'kabkota' GROUP BY p.nama_provinsi`;
+  const pulau = (...kata: string[]) =>
+    perProvinsi
+      .filter((r) => kata.some((k) => r.nama_provinsi.includes(k)))
+      .reduce((s, r) => ({ pendidikan: s.pendidikan + r.pendidikan, total: s.total + r.total }), { pendidikan: 0, total: 0 });
+  return {
+    ringkasan,
+    klaster,
+    klasterSemua,
+    persenPatahan: patahan.persen,
+    validasiLolos: validasi.lolos,
+    pulau: { sulawesi: pulau("Sulawesi", "Gorontalo"), kalimantan: pulau("Kalimantan") },
+  };
 }

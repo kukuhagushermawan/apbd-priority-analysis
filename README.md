@@ -79,7 +79,7 @@ Buka http://localhost:3000. Untuk deploy, `DATABASE_URL` diganti dengan connecti
 
 | Halaman | Isi |
 |---|---|
-| `/` | Halaman pembuka: peta titik Indonesia, temuan utama, cara kerja, pintu masuk ke dashboard |
+| `/` | Halaman pembuka: peta titik Indonesia beranotasi, temuan utama, pintu masuk ke dashboard |
 | `/ringkasan` | Komposisi belanja seluruh daerah dan perubahannya tiap tahun |
 | `/tren` | Fungsi yang porsinya terus naik atau turun |
 | `/pergeseran` | Tahun dan daerah dengan perubahan prioritas paling tajam |

@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+data/processed/*
+!data/processed/.gitkeep
+node_modules/
+.next/
+.env
+.env.local
+.ruff_cache/

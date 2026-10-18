@@ -1,0 +1,10 @@
+[tool.pytest.ini_options]
+testpaths = ["pipeline/tests"]
+
+[tool.ruff]
+line-length = 140
+target-version = "py311"
+extend-exclude = ["web"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]

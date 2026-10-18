@@ -33,9 +33,10 @@ pipeline/
   test_rumus.py               uji rumus
 web/
   prisma/schema.prisma        skema database (11 tabel)
-  src/app/                    halaman + API (/api/ringkasan, /api/unduh)
-  src/components/             sidebar, filter, grafik ECharts
-  src/lib/data.ts             kueri database
+  src/app/                    8 halaman + API (/api/ringkasan, /tren, /pergeseran,
+                              /daerah/[kode], /klaster, /proyeksi, /unduh)
+  src/components/             sidebar, filter, pencarian pemda, grafik ECharts
+  src/lib/data.ts             semua kueri database (satu bagian per halaman)
 docs/metodologi.md            temuan data, rumus, hasil backtest, keputusan
 ```
 
@@ -72,12 +73,28 @@ npm run dev
 
 Buka http://localhost:3000. Untuk deploy, `DATABASE_URL` diganti dengan connection string Neon/Supabase.
 
+## Halaman
+
+| Halaman | Pertanyaan yang dijawab |
+|---|---|
+| Ringkasan Nasional | Bagaimana komposisi belanja bergeser 2022–2026? |
+| Tren per Fungsi | Fungsi apa yang naik/turun konsisten? |
+| Deteksi Pergeseran | Kapan dan di mana pergeseran tajam terjadi, siapa penyumbangnya? |
+| Profil Daerah | Bagaimana satu pemda dibanding median dan klasternya? |
+| Perbandingan | Apa beda 2–4 pemda (share atau nominal)? |
+| Peta & Klaster | Pemda mana yang strukturnya mirip, dan siapa yang pindah kelompok? |
+| Proyeksi 2027–2028 | Ke mana arah share bila pola berlanjut, seberapa akurat modelnya? |
+| Kualitas Data & Unduh | Seberapa valid datanya, dan bagaimana mengunduhnya? |
+
+Filter tahun, tingkat, provinsi, dan fungsi tersimpan di URL, jadi tampilan bisa dibagikan. Semua nama
+pemda tertaut ke Profil Daerah.
+
 ## Status
 
 | Milestone | Status |
 |---|---|
 | 1–2 Data: audit format, standardisasi, share, validasi | selesai |
 | 3 Analitik dan prediksi dengan backtest | selesai |
-| 4 Database + API + halaman Ringkasan Nasional | selesai, menunggu tinjauan |
-| 5 Tujuh halaman lainnya | – |
+| 4 Database + API + halaman Ringkasan Nasional | selesai |
+| 5 Tujuh halaman lainnya | selesai, menunggu tinjauan (peta choropleth menunggu GeoJSON) |
 | 6 Pengujian, dokumentasi, deploy Vercel | – |

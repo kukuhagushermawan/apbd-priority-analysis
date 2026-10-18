@@ -34,6 +34,16 @@ export function bacaFilter(params: Params): Filter {
   };
 }
 
+/** Tautan ke path dengan filter global + parameter khusus halaman (null = hapus). */
+export function tautan(path: string, filter: Partial<Filter>, ekstra: Record<string, string | null> = {}): string {
+  const q = new URLSearchParams(keQuery(filter).slice(1));
+  for (const [k, v] of Object.entries(ekstra)) {
+    if (v) q.set(k, v);
+  }
+  const s = q.toString();
+  return `${path}${s ? `?${s}` : ""}`;
+}
+
 /** Query string untuk tautan, supaya filter ikut terbawa antarhalaman. */
 export function keQuery(filter: Partial<Filter>): string {
   const q = new URLSearchParams();

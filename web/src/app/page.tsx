@@ -74,14 +74,14 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/">["searchParam
           keterangan="Σ anggaran fungsi ÷ Σ total belanja pemda terpilih, 2022–2026. Klik segmen untuk melihat trennya."
           definisi="share"
         >
-          <GrafikKomposisi data={data} />
+          <GrafikKomposisi tahun={data.tahun} komposisi={data.komposisi} />
         </KartuGrafik>
         <KartuGrafik
           judul="Perubahan share Anggaran (Δshare, pp)"
           keterangan="Biru = naik, merah = turun dibanding tahun sebelumnya. ⚑ 2023 dipengaruhi patahan klasifikasi. Klik sel untuk melihat pemda penyumbang."
           definisi="delta"
         >
-          <HeatmapDelta data={data} />
+          <HeatmapDelta delta={data.delta} />
         </KartuGrafik>
       </section>
 

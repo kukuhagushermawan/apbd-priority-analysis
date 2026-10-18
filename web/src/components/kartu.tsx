@@ -1,4 +1,4 @@
-import { Info, SearchX } from "lucide-react";
+import { AlertTriangle, Info, SearchX } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -77,12 +77,43 @@ export function KerangkaMemuat() {
   );
 }
 
-/** Penanda halaman yang dibangun pada milestone 5. */
-export function Menyusul({ judul, isi }: { judul: string; isi: string }) {
+/** Tombol pilihan berupa tautan (mis. periode, Nominal ↔ Share), nilai tersimpan di URL. */
+export function PilihanTautan({ label, pilihan }: { label: string; pilihan: { teks: string; href: string; aktif: boolean }[] }) {
   return (
-    <>
-      <JudulHalaman judul={judul} keterangan={isi} />
-      <Kosong pesan="Halaman ini sedang dibangun (milestone 5)." />
-    </>
+    <div className="flex flex-wrap items-center gap-2 text-xs">
+      <span className="font-medium text-muted-foreground">{label}</span>
+      <div className="inline-flex rounded-md border bg-card p-0.5">
+        {pilihan.map((p) => (
+          <Link
+            key={p.teks}
+            href={p.href}
+            scroll={false}
+            aria-current={p.aktif ? "true" : undefined}
+            className={`rounded px-3 py-1 ${p.aktif ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-secondary"}`}
+          >
+            {p.teks}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Peringatan berlatar kuning (patahan klasifikasi, sifat eksploratif). */
+export function Peringatan({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex gap-2 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+      <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
+      <div>{children}</div>
+    </div>
+  );
+}
+
+/** Tautan nama pemda: semua jalur bermuara ke Profil Daerah. */
+export function TautanPemda({ kode, nama, query = "" }: { kode: string; nama: string; query?: string }) {
+  return (
+    <Link href={`/daerah/${kode}${query}`} className="font-medium text-primary hover:underline">
+      {nama}
+    </Link>
   );
 }
